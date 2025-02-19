@@ -267,6 +267,7 @@ GameObject:
   - component: {fileID: 205257964}
   - component: {fileID: 205257963}
   - component: {fileID: 205257962}
+  - component: {fileID: 205257967}
   - component: {fileID: 205257961}
   m_Layer: 11
   m_Name: Controller
@@ -317,22 +318,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d447ca2096ec2df419beefe93350282e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  avatarType: 1
   movementType: 1
   keyboardSpeed: 6
   navMeshSpeed: 6
   jumpForce: 5
   rotationOffset: 0
   acceleration: 10
-  deceleration: 10
   angularSpeed: 360
   airControlFactor: 0.7
   inAirSmoothMultiplier: 3
   baseSmoothTime: 0.05
   navmeshSmoothTime: 0.1
-  patrolRadius: 10
-  waitTimeAtPatrolPoint: 2
-  patrolTimeout: 5
   groundCheckOffset: 1
   groundCheckRadius: 0.3
   groundLayer:
@@ -340,7 +336,6 @@ MonoBehaviour:
     m_Bits: 16385
   groundedToFalseDelay: 0.3
   falseToGroundedDelay: 0.3
-  minAirborneTime: 0.2
 --- !u!114 &205257963
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -424,6 +419,21 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &205257967
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 205257959}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 108f0cc68ade6584d92244c07fea5220, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  patrolRadius: 10
+  waitTimeAtPatrolPoint: 2
+  patrolTimeout: 5
 --- !u!1 &248830398
 GameObject:
   m_ObjectHideFlags: 0
@@ -500,6 +510,7 @@ GameObject:
   - component: {fileID: 257731186}
   - component: {fileID: 257731185}
   - component: {fileID: 257731184}
+  - component: {fileID: 257731189}
   - component: {fileID: 257731183}
   m_Layer: 11
   m_Name: Controller
@@ -550,22 +561,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d447ca2096ec2df419beefe93350282e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  avatarType: 1
   movementType: 1
   keyboardSpeed: 6
   navMeshSpeed: 6
   jumpForce: 5
   rotationOffset: 0
   acceleration: 10
-  deceleration: 10
   angularSpeed: 360
   airControlFactor: 0.7
   inAirSmoothMultiplier: 3
   baseSmoothTime: 0.05
   navmeshSmoothTime: 0.1
-  patrolRadius: 10
-  waitTimeAtPatrolPoint: 2
-  patrolTimeout: 5
   groundCheckOffset: 1
   groundCheckRadius: 0.3
   groundLayer:
@@ -573,7 +579,6 @@ MonoBehaviour:
     m_Bits: 16385
   groundedToFalseDelay: 0.3
   falseToGroundedDelay: 0.3
-  minAirborneTime: 0.2
 --- !u!114 &257731185
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -657,6 +662,21 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &257731189
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 257731181}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 108f0cc68ade6584d92244c07fea5220, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  patrolRadius: 10
+  waitTimeAtPatrolPoint: 2
+  patrolTimeout: 5
 --- !u!1 &283593639
 GameObject:
   m_ObjectHideFlags: 0
@@ -1895,22 +1915,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d447ca2096ec2df419beefe93350282e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  avatarType: 0
   movementType: 0
   keyboardSpeed: 6
   navMeshSpeed: 6
   jumpForce: 5
   rotationOffset: 0
   acceleration: 10
-  deceleration: 10
   angularSpeed: 360
   airControlFactor: 0.7
   inAirSmoothMultiplier: 3
   baseSmoothTime: 0.05
   navmeshSmoothTime: 0.1
-  patrolRadius: 10
-  waitTimeAtPatrolPoint: 2
-  patrolTimeout: 5
   groundCheckOffset: 1
   groundCheckRadius: 0.3
   groundLayer:
@@ -1918,7 +1933,6 @@ MonoBehaviour:
     m_Bits: 16385
   groundedToFalseDelay: 0.3
   falseToGroundedDelay: 0.3
-  minAirborneTime: 0.2
 --- !u!1 &1000762756
 GameObject:
   m_ObjectHideFlags: 0
@@ -2130,6 +2144,7 @@ GameObject:
   - component: {fileID: 1215888519}
   - component: {fileID: 1215888518}
   - component: {fileID: 1215888517}
+  - component: {fileID: 1215888522}
   - component: {fileID: 1215888516}
   m_Layer: 11
   m_Name: Controller
@@ -2180,22 +2195,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d447ca2096ec2df419beefe93350282e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  avatarType: 1
   movementType: 1
   keyboardSpeed: 6
   navMeshSpeed: 6
   jumpForce: 5
   rotationOffset: 0
   acceleration: 10
-  deceleration: 10
   angularSpeed: 360
   airControlFactor: 0.7
   inAirSmoothMultiplier: 3
   baseSmoothTime: 0.05
   navmeshSmoothTime: 0.1
-  patrolRadius: 10
-  waitTimeAtPatrolPoint: 2
-  patrolTimeout: 5
   groundCheckOffset: 1
   groundCheckRadius: 0.3
   groundLayer:
@@ -2203,7 +2213,6 @@ MonoBehaviour:
     m_Bits: 16385
   groundedToFalseDelay: 0.3
   falseToGroundedDelay: 0.3
-  minAirborneTime: 0.2
 --- !u!114 &1215888518
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2287,6 +2296,21 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &1215888522
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1215888514}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 108f0cc68ade6584d92244c07fea5220, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  patrolRadius: 10
+  waitTimeAtPatrolPoint: 2
+  patrolTimeout: 5
 --- !u!1 &1218877651
 GameObject:
   m_ObjectHideFlags: 0

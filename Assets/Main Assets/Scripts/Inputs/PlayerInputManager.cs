@@ -37,26 +37,27 @@ public class PlayerInputManager : MonoBehaviour
 
     private void OnMovePerformed(InputAction.CallbackContext context)
     {
-        if (avatarController.avatarType != AvatarType.Player) return;
+        // Operiamo solo se l'avatar è Player
+        if (avatarController.AvatarType != AvatarType.Player) return;
         Vector2 move = context.ReadValue<Vector2>();
         avatarController.SetMoveInput(move);
     }
 
     private void OnMoveCanceled(InputAction.CallbackContext context)
     {
-        if (avatarController.avatarType != AvatarType.Player) return;
+        if (avatarController.AvatarType != AvatarType.Player) return;
         avatarController.SetMoveInput(Vector2.zero);
     }
 
     private void OnJumpPerformed(InputAction.CallbackContext context)
     {
-        if (avatarController.avatarType != AvatarType.Player) return;
+        if (avatarController.AvatarType != AvatarType.Player) return;
         avatarController.SetJumpInput(true);
     }
 
     private void OnClickPerformed(InputAction.CallbackContext context)
     {
-        if (avatarController.avatarType != AvatarType.Player) return;
+        if (avatarController.AvatarType != AvatarType.Player) return;
         if (avatarController != null && avatarController.gameObject.activeInHierarchy)
         {
             if (avatarController.MovementMode == MovementType.PointAndClick)
@@ -66,10 +67,8 @@ public class PlayerInputManager : MonoBehaviour
                 Debug.DrawRay(ray.origin, ray.direction * 100f, Color.green, 2f);
                 if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, surfaceLayerMask))
                 {
-                    // Assicuriamoci che il punto sia sulla NavMesh (se possibile)
                     if (NavMesh.SamplePosition(hit.point, out NavMeshHit hitInfo, 1.0f, NavMesh.AllAreas))
                     {
-                        Debug.Log("Click rilevato su superficie target: destinazione " + hitInfo.position);
                         avatarController.SetTargetPosition(hitInfo.position);
                     }
                     else

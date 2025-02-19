@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Events; // Aggiunto per gli UnityEvent
 
 public enum MovementType { Keyboard, PointAndClick }
 public enum AvatarType { Player, NPC }
@@ -7,17 +8,20 @@ public enum MovementState { Idle, Walking, Jumping }
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(Collider))]
+[RequireComponent(typeof(NavMeshAgent))]
 public class AvatarController : MonoBehaviour
 {
-    [Header("Tipologia Avatar")]
-    public AvatarType avatarType = AvatarType.Player;
+    [Header("Eventi")]
+    public UnityEvent OnJump;  // Evento invocato al momento del salto
+    public UnityEvent OnLand;  // Evento invocato quando l'avatar tocca il terreno
 
     [Header("Modalità di Movimento")]
     [SerializeField] private MovementType movementType = MovementType.Keyboard;
     public MovementType MovementMode {
         get => movementType;
         set {
-            if (avatarType == AvatarType.NPC)
+            // Se è un NPC (ovvero se è presente il componente NPCBehaviour) si forza il movimento in PointAndClick
+            if (AvatarType == AvatarType.NPC)
                 movementType = MovementType.PointAndClick;
             else {
                 movementType = value;
@@ -37,8 +41,6 @@ public class AvatarController : MonoBehaviour
     [Header("Keyboard Movement Settings")]
     [Tooltip("Velocità di accelerazione (unità/secondo)")]
     [SerializeField] private float acceleration = 10f;
-    [Tooltip("Velocità di decelerazione (unità/secondo)")]
-    [SerializeField] private float deceleration = 10f;
     [Tooltip("Velocità angolare (gradi/secondo) per la rotazione")]
     [SerializeField] private float angularSpeed = 360f;
     [Tooltip("Fattore di controllo in aria (0 = nessun controllo, 1 = controllo uguale a terra)")]
@@ -48,32 +50,9 @@ public class AvatarController : MonoBehaviour
     [SerializeField] private float inAirSmoothMultiplier = 3f;
     [SerializeField] private float baseSmoothTime = 0.05f;
 
-    // Tempo per lo smoothing in modalità NavMesh – usato con SmoothDamp
+    // Tempo per lo smoothing in modalità NavMesh
     [SerializeField] private float navmeshSmoothTime = 0.1f;
     private Vector3 _navmeshVelocitySmoothDamp = Vector3.zero;
-
-    [Header("Patrolling NPC")]
-    [SerializeField] private float patrolRadius = 10f;
-    [SerializeField] private float waitTimeAtPatrolPoint = 2f;
-    [SerializeField] private float patrolTimeout = 5f;
-    private float patrolTimer = 0f;
-
-    // Stato dell'avatar
-    private MovementState currentState = MovementState.Idle;
-
-    // Componenti
-    private Rigidbody rb;
-    private NavMeshAgent navAgent;
-    private Transform camTransform;
-
-    // Variabili input (per il Player)
-    private Vector2 moveInput;
-    private bool jumpInput;
-    private Vector3 targetPosition; // destinazione impostata dal raycast
-
-    // Variabili per il patrolling NPC
-    private bool waiting = false;
-    private float waitTimer = 0f;
 
     // Parametri per il Ground Check
     [Header("Ground Check")]
@@ -90,25 +69,46 @@ public class AvatarController : MonoBehaviour
     private bool isGroundedDelayed = true;
     private float groundedStateTimer = 0f;
 
-    // Variabili per la gestione del salto "inertia" (per il Player)
+    // Variabili per la gestione del salto (solo per il Player)
     private bool isAirborne = false;
     private Vector3 storedMoveDirection = Vector3.zero;
-    [SerializeField] private float minAirborneTime = 0.2f;
     private float jumpStartTime = 0f;
+
+    // Stato dell'avatar
+    private MovementState currentState = MovementState.Idle;
+
+    // Componenti
+    private Rigidbody rb;
+    private NavMeshAgent navAgent;
+    private Transform camTransform;
+
+    // Variabili input (per il Player)
+    private Vector2 moveInput;
+    private bool jumpInput;
+    private Vector3 targetPosition;
+
+    /// <summary>
+    /// Determina il tipo di avatar in base alla presenza del componente NPCBehaviour.
+    /// Se è presente, l'avatar è NPC, altrimenti è Player.
+    /// </summary>
+    public AvatarType AvatarType {
+        get { return GetComponent<NPCBehaviour>() != null ? AvatarType.NPC : AvatarType.Player; }
+    }
 
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
         rb.isKinematic = false;
         rb.interpolation = RigidbodyInterpolation.Interpolate;
-        // Blocchiamo le rotazioni su X e Z; la rotazione sull'asse Y la gestiamo via script
+        // Blocca le rotazioni su X e Z;
         rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
         rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 
         camTransform = Camera.main != null ? Camera.main.transform : null;
         navAgent = GetComponent<NavMeshAgent>();
 
-        if (avatarType == AvatarType.NPC)
+        // Se è un NPC forziamo il movimento PointAndClick
+        if (AvatarType == AvatarType.NPC)
             movementType = MovementType.PointAndClick;
 
         UpdateMovementMode();
@@ -118,10 +118,9 @@ public class AvatarController : MonoBehaviour
     {
         if (navAgent != null)
         {
-            if (movementType == MovementType.Keyboard && avatarType == AvatarType.Player)
+            if (movementType == MovementType.Keyboard && AvatarType == AvatarType.Player)
             {
                 navAgent.enabled = false;
-                //Debug.Log("Modalità Keyboard: NavMeshAgent disabilitato");
             }
             else
             {
@@ -131,38 +130,33 @@ public class AvatarController : MonoBehaviour
                 navAgent.acceleration = acceleration;
                 navAgent.angularSpeed = angularSpeed;
                 navAgent.stoppingDistance = 0.1f;
-                //Debug.Log("Modalità PointAndClick: NavMeshAgent abilitato (updatePosition=false)");
             }
         }
     }
 
     void Update()
     {
-        if (avatarType == AvatarType.Player)
+        // Gestione input solo per il Player
+        if (AvatarType == AvatarType.Player)
         {
             if (movementType == MovementType.Keyboard)
                 HandleKeyboardInput();
             else if (movementType == MovementType.PointAndClick)
                 HandlePointAndClickInput();
         }
-        else
-        {
-            HandleNPCPatrol();
-        }
     }
 
-    // In LateUpdate gestiamo sia la rotazione che il movimento NavMesh con SmoothDamp
+    // Gestione della rotazione e il movimento NavMesh
     void LateUpdate()
     {
-        if ((avatarType == AvatarType.Player && movementType == MovementType.PointAndClick) || avatarType == AvatarType.NPC)
+        if ((AvatarType == AvatarType.Player && movementType == MovementType.PointAndClick) || AvatarType == AvatarType.NPC)
         {
             if (navAgent != null && navAgent.enabled)
             {
                 Vector3 agentTarget = navAgent.nextPosition;
                 Vector3 currentPos = rb.position;
-                // Manteniamo la componente verticale corrente
                 Vector3 targetPos = new Vector3(agentTarget.x, currentPos.y, agentTarget.z);
-                // Utilizziamo SmoothDamp per ottenere una transizione fluida
+                // Transizione fluida
                 Vector3 smoothPos = Vector3.SmoothDamp(currentPos, targetPos, ref _navmeshVelocitySmoothDamp, navmeshSmoothTime);
                 rb.MovePosition(smoothPos);
             }
@@ -194,7 +188,7 @@ public class AvatarController : MonoBehaviour
     {
         UpdateGroundedDelayedState();
 
-        if (avatarType == AvatarType.Player)
+        if (AvatarType == AvatarType.Player)
         {
             if (movementType == MovementType.Keyboard)
             {
@@ -209,6 +203,7 @@ public class AvatarController : MonoBehaviour
                     isAirborne = true;
                     jumpStartTime = Time.time;
                     rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+                    OnJump?.Invoke(); // Evento invocato al salto
                     jumpInput = false;
                 }
 
@@ -230,7 +225,6 @@ public class AvatarController : MonoBehaviour
             }
             else if (movementType == MovementType.PointAndClick)
             {
-                // In modalità NavMesh il salto viene gestito qui; il movimento orizzontale è in LateUpdate
                 if (isAirborne && jumpInput)
                     jumpInput = false;
                 if (!isAirborne && jumpInput && isGroundedDelayed)
@@ -238,16 +232,12 @@ public class AvatarController : MonoBehaviour
                     isAirborne = true;
                     jumpStartTime = Time.time;
                     rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+                    OnJump?.Invoke(); // Evento invocato al salto
                     jumpInput = false;
                 }
             }
         }
-        else
-        {
-            // NPC: eventuale salto o altre logiche in FixedUpdate (se necessario)
-        }
-
-        // Azzeriamo la velocità angolare per evitare rotazioni indesiderate dovute a forze esterne
+        
         rb.angularVelocity = Vector3.zero;
     }
 
@@ -277,7 +267,7 @@ public class AvatarController : MonoBehaviour
     }
     #endregion
 
-    #region Input e Stato per il Player
+    #region Input per il Player
     private void HandleKeyboardInput()
     {
         currentState = moveInput.sqrMagnitude > 0.01f ? MovementState.Walking : MovementState.Idle;
@@ -294,68 +284,6 @@ public class AvatarController : MonoBehaviour
         else
         {
             currentState = MovementState.Walking;
-        }
-    }
-    #endregion
-
-    #region Patrolling NPC
-    private void HandleNPCPatrol()
-    {
-        if (navAgent == null) return;
-
-        if (!navAgent.pathPending && navAgent.remainingDistance > navAgent.stoppingDistance && navAgent.desiredVelocity.sqrMagnitude < 0.01f)
-        {
-            patrolTimer += Time.deltaTime;
-            if (patrolTimer >= patrolTimeout)
-            {
-                patrolTimer = 0f;
-                SetNewPatrolDestination();
-            }
-        }
-        else
-        {
-            patrolTimer = 0f;
-        }
-
-        if (!navAgent.pathPending &&
-            navAgent.remainingDistance <= navAgent.stoppingDistance &&
-            navAgent.desiredVelocity.sqrMagnitude < 0.01f)
-        {
-            if (!waiting)
-            {
-                waiting = true;
-                waitTimer = 0f;
-            }
-            else
-            {
-                waitTimer += Time.deltaTime;
-                if (waitTimer >= waitTimeAtPatrolPoint)
-                {
-                    waiting = false;
-                    SetNewPatrolDestination();
-                }
-            }
-        }
-        else
-        {
-            waiting = false;
-            waitTimer = 0f;
-        }
-
-        currentState = (!navAgent.pathPending &&
-                        navAgent.remainingDistance <= navAgent.stoppingDistance &&
-                        navAgent.desiredVelocity.sqrMagnitude < 0.01f)
-                        ? MovementState.Idle : MovementState.Walking;
-    }
-
-    private void SetNewPatrolDestination()
-    {
-        Vector3 randomDirection = Random.insideUnitSphere * patrolRadius;
-        randomDirection += transform.position;
-        if (NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, patrolRadius, NavMesh.AllAreas))
-        {
-            navAgent.SetDestination(hit.position);
-            //Debug.Log("NPC nuova destinazione: " + hit.position);
         }
     }
     #endregion
@@ -379,7 +307,7 @@ public class AvatarController : MonoBehaviour
     #region GUI Toggle (solo per il Player)
     private void OnGUI()
     {
-        if (avatarType != AvatarType.Player) return;
+        if (AvatarType != AvatarType.Player) return;
         string buttonText = movementType == MovementType.Keyboard ? "Switch to PointAndClick" : "Switch to Keyboard";
         if (GUI.Button(new Rect(10, 10, 220, 40), buttonText))
         {
@@ -388,27 +316,26 @@ public class AvatarController : MonoBehaviour
     }
     #endregion
 
-    #region Metodi Pubblici di Set (per PlayerInputManager)
+    #region Metodi Pubblici per PlayerInputManager
     public void SetMoveInput(Vector2 input)
     {
-        if (avatarType != AvatarType.Player) return;
+        if (AvatarType != AvatarType.Player) return;
         moveInput = input;
     }
 
     public void SetJumpInput(bool jump)
     {
-        if (avatarType != AvatarType.Player) return;
+        if (AvatarType != AvatarType.Player) return;
         jumpInput = jump;
     }
 
     public void SetTargetPosition(Vector3 pos)
     {
-        if (avatarType != AvatarType.Player) return;
+        if (AvatarType != AvatarType.Player) return;
         targetPosition = pos;
         if (navAgent != null && navAgent.enabled)
         {
             navAgent.SetDestination(targetPosition);
-            //Debug.Log("Destinazione impostata: " + targetPosition);
         }
     }
     #endregion
@@ -418,6 +345,10 @@ public class AvatarController : MonoBehaviour
     {
         if (((1 << collision.gameObject.layer) & groundLayer) != 0)
         {
+            if (isAirborne) // Se era in salto, invoca l'evento di "atterraggio"
+            {
+                OnLand?.Invoke();
+            }
             isAirborne = false;
             storedMoveDirection = Vector3.zero;
         }
@@ -427,6 +358,10 @@ public class AvatarController : MonoBehaviour
             {
                 if (Vector3.Dot(contact.normal, Vector3.up) < 0.5f)
                 {
+                    if (isAirborne)
+                    {
+                        OnLand?.Invoke();
+                    }
                     isAirborne = false;
                     storedMoveDirection = Vector3.zero;
                     break;
