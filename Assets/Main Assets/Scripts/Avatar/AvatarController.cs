@@ -33,7 +33,7 @@ public class AvatarController : MonoBehaviour
     [Tooltip("Offset (in gradi) per correggere la direzione frontale del modello")]
     public float rotationOffset = 0f;
 
-    // Impostazioni per il movimento con tastiera (che verranno usate anche per il NavMeshAgent)
+    // Impostazioni per il movimento con tastiera (utilizzate anche per il NavMeshAgent)
     [Header("Keyboard Movement Settings")]
     [Tooltip("Velocità di accelerazione (unità/secondo)")]
     [SerializeField] private float acceleration = 10f;
@@ -41,16 +41,18 @@ public class AvatarController : MonoBehaviour
     [SerializeField] private float deceleration = 10f;
     [Tooltip("Velocità angolare (gradi/secondo) per la rotazione")]
     [SerializeField] private float angularSpeed = 360f;
-    // Nuovo parametro: fattore di controllo in aria (tra 0 e 1, dove 1 significa controllo completo a terra)
     [Tooltip("Fattore di controllo in aria (0 = nessun controllo, 1 = controllo uguale a terra)")]
     [SerializeField] private float airControlFactor = 0.5f;
-    // Variabile per gestire la velocità attuale (solo componente orizzontale)
-    private Vector3 currentHorizontalVelocity = Vector3.zero;
-    // Variabile per il SmoothDamp (richiesta dal SmoothDamp)
+    // Variabile per lo smooth della velocità (modalità tastiera)
     private Vector3 _velocitySmoothDamp = Vector3.zero;
-    // Moltiplicatore per il tempo di smoothing in aria (ad es. se è 1.0 il tempo di smoothing è baseSmoothTime, se è 2.0 si raddoppia)
     [Tooltip("Moltiplicatore per il tempo di smoothing in aria rispetto a terra")]
     [SerializeField] private float inAirSmoothMultiplier = 3f;
+    // Tempo base per lo smooth (modalità tastiera)
+    [SerializeField] private float baseSmoothTime = 0.05f;
+
+    // Parametro di smoothing per la modalità NavMesh (PointAndClick / NPC)
+    [SerializeField] private float navmeshSmoothTime = 0.1f;
+    private Vector3 _navmeshVelocitySmoothDamp = Vector3.zero;
 
     [Header("Patrolling NPC")]
     [SerializeField] private float patrolRadius = 10f;
@@ -67,7 +69,7 @@ public class AvatarController : MonoBehaviour
     private Transform camTransform;
 
     // Variabili input (per il Player)
-    private Vector2 moveInput; // viene aggiornato anche durante il salto
+    private Vector2 moveInput; // aggiornato anche durante il salto
     private bool jumpInput;
     private Vector3 targetPosition; // per PointAndClick
 
@@ -75,26 +77,18 @@ public class AvatarController : MonoBehaviour
     private bool waiting = false;
     private float waitTimer = 0f;
 
-    [SerializeField] private float smoothFactorNavMesh = 10f;
-
-    // Parametri per il controllo delle collisioni durante il movimento
-    [SerializeField] private float safetyMargin = 0.1f;
-    [SerializeField] private float skinWidth = 0.05f;
-    [SerializeField] private float sphereCastRadius = 0.5f;
-
     // Parametri per il Ground Check
     [Header("Ground Check")]
     [SerializeField] private float groundCheckOffset = 0.1f;
     [SerializeField] private float groundCheckRadius = 0.2f;
     [SerializeField] private LayerMask groundLayer;
 
-    // *** Nuovi parametri per il ritardo del Ground Check ***
+    // Parametri per il ritardo del Ground Check
     [Header("Ground Check Delay")]
     [Tooltip("Delay (in secondi) per passare da grounded (true) a non grounded (false)")]
     [SerializeField] private float groundedToFalseDelay = 0.5f;
     [Tooltip("Delay (in secondi) per passare da non grounded (false) a grounded (true)")]
     [SerializeField] private float falseToGroundedDelay = 0.1f;
-    // Stato ritardato del ground check e timer per la transizione
     private bool isGroundedDelayed = true; // inizialmente considerato a terra
     private float groundedStateTimer = 0f;
 
@@ -134,12 +128,9 @@ public class AvatarController : MonoBehaviour
             {
                 navAgent.enabled = true;
                 navAgent.updatePosition = false;
-                // Assegna i valori configurati nell'Inspector:
                 navAgent.speed = navMeshSpeed;
-                // Usiamo i valori "acceleration" e "angularSpeed" definiti per il movimento con tastiera
                 navAgent.acceleration = acceleration;
                 navAgent.angularSpeed = angularSpeed;
-                // Lasciamo invariata la distanza di arresto (si può rendere configurabile se necessario)
                 navAgent.stoppingDistance = 0.1f;
                 Debug.Log("Modalità PointAndClick: NavMeshAgent abilitato (updatePosition=false)");
             }
@@ -152,23 +143,26 @@ public class AvatarController : MonoBehaviour
         if (avatarType == AvatarType.Player)
         {
             if (movementType == MovementType.Keyboard)
-            {
                 HandleKeyboardInput();
-            }
             else if (movementType == MovementType.PointAndClick)
-            {
                 HandlePointAndClickInput();
-            }
         }
         else // NPC
         {
             HandleNPCPatrol();
         }
-
-        RotateInMovementDirection();
     }
 
-    // Aggiorna lo stato "grounded" con ritardo (da false a true e viceversa)
+    // Per la modalità NavMesh (e NPC) la rotazione viene aggiornata in LateUpdate per stare in sincronia col ciclo della camera
+    private void LateUpdate()
+    {
+        if ((avatarType == AvatarType.Player && movementType == MovementType.PointAndClick) || avatarType == AvatarType.NPC)
+        {
+            RotateNavmesh();
+        }
+    }
+
+    // Aggiorna lo stato "grounded" con un ritardo
     private void UpdateGroundedDelayedState()
     {
         bool currentCheck = IsTouchingGround();
@@ -188,24 +182,21 @@ public class AvatarController : MonoBehaviour
         }
     }
 
-    // Movimento fisico
+    // MOVIMENTO: utilizzo di rb.velocity per sfruttare l'interpolazione
     void FixedUpdate()
     {
-        // Aggiorno lo stato ritardato del Ground Check
         UpdateGroundedDelayedState();
 
         if (avatarType == AvatarType.Player)
         {
             if (movementType == MovementType.Keyboard)
             {
-                // Calcola la direzione corrente dall'input (solo componente orizzontale)
+                // Calcola la direzione dall'input (orizzontale)
                 Vector3 inputDir = new Vector3(-moveInput.y, 0, moveInput.x).normalized;
 
-                // Se il personaggio è già in aria, cancelliamo eventuali input di salto buffered
                 if (isAirborne && jumpInput)
                     jumpInput = false;
 
-                // Se siamo a terra (usando lo stato ritardato) e si è premuto il tasto di salto, eseguiamo il salto
                 if (!isAirborne && jumpInput && isGroundedDelayed)
                 {
                     storedMoveDirection = inputDir;
@@ -215,50 +206,31 @@ public class AvatarController : MonoBehaviour
                     jumpInput = false;
                 }
 
-                // Durante il salto, usiamo la direzione memorizzata per controllare il movimento orizzontale
                 if (isAirborne)
-                {
                     inputDir = storedMoveDirection;
-                }
 
-                // --- SISTEMA DI ACCELERAZIONE / DECELERAZIONE CON SMOOTHDAMP ---
-                // Se in aria, riduciamo il controllo orizzontale usando airControlFactor
                 float effectiveSpeed = isAirborne ? keyboardSpeed * airControlFactor : keyboardSpeed;
-                Vector3 desiredVelocity = inputDir * effectiveSpeed;
-                float baseSmoothTime = 0.05f;
+                Vector3 targetVelocity = inputDir * effectiveSpeed;
+
                 float smoothTime = isAirborne ? baseSmoothTime * inAirSmoothMultiplier : baseSmoothTime;
-                
-                // Applica il SmoothDamp alla componente orizzontale
-                Vector3 currentHorizontal = new Vector3(currentHorizontalVelocity.x, 0, currentHorizontalVelocity.z);
-                Vector3 targetHorizontal = new Vector3(desiredVelocity.x, 0, desiredVelocity.z);
-                currentHorizontal = Vector3.SmoothDamp(currentHorizontal, targetHorizontal, ref _velocitySmoothDamp, smoothTime);
-                currentHorizontalVelocity = currentHorizontal;  // aggiorna la velocità orizzontale
+                Vector3 currentHorizontal = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+                Vector3 newHorizontal = Vector3.SmoothDamp(currentHorizontal, targetVelocity, ref _velocitySmoothDamp, smoothTime);
 
-                // Proietta la velocità sul piano definito dalla normale del terreno
+                // Proiezione sul piano definito dalla normale del terreno
                 Vector3 groundNormal = GetGroundNormal();
-                Vector3 adjustedVelocity = Vector3.ProjectOnPlane(currentHorizontalVelocity, groundNormal);
+                Vector3 adjustedVelocity = Vector3.ProjectOnPlane(newHorizontal, groundNormal);
 
-                // Calcola lo spostamento per questo frame
-                Vector3 displacement = adjustedVelocity * Time.fixedDeltaTime;
+                // Imposta la velocità mantenendo la componente verticale
+                rb.velocity = new Vector3(adjustedVelocity.x, rb.velocity.y, adjustedVelocity.z);
 
-                // Verifica se il percorso è bloccato da un ostacolo (con SphereCast)
-                if (displacement.sqrMagnitude > 0.0001f)
-                {
-                    Ray sphereCastRay = new Ray(rb.position, displacement.normalized);
-                    float distance = displacement.magnitude;
-                    if (Physics.SphereCast(sphereCastRay, sphereCastRadius, out RaycastHit hit, distance + safetyMargin + skinWidth))
-                    {
-                        displacement = displacement.normalized * Mathf.Max(0, hit.distance - safetyMargin - skinWidth);
-                    }
-                }
-                
-                rb.MovePosition(rb.position + displacement);
+                // ROTAZIONE per la modalità Keyboard aggiornata in FixedUpdate
+                RotateKeyboard();
             }
             else if (movementType == MovementType.PointAndClick)
             {
                 if (navAgent != null && navAgent.enabled)
                 {
-                    // Logica simile per il salto in modalità PointAndClick
+                    // Gestione del salto in modalità PointAndClick
                     if (isAirborne && jumpInput)
                         jumpInput = false;
                     if (!isAirborne && jumpInput && isGroundedDelayed)
@@ -268,25 +240,82 @@ public class AvatarController : MonoBehaviour
                         rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
                         jumpInput = false;
                     }
-                    
-                    Vector3 targetPos = Vector3.Lerp(rb.position, navAgent.nextPosition, smoothFactorNavMesh * Time.fixedDeltaTime);
-                    rb.MovePosition(targetPos);
+
+                    // Calcola la direzione verso il prossimo punto della navmesh
+                    Vector3 toTarget = navAgent.nextPosition - rb.position;
+                    Vector3 desiredDir = toTarget.normalized;
+                    float distance = toTarget.magnitude;
+                    float factor = Mathf.Clamp01(distance);
+                    Vector3 targetNavVelocity = desiredDir * navMeshSpeed * factor;
+
+                    // Smooth per la velocità in modalità NavMesh
+                    Vector3 currentNavVelocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+                    Vector3 newNavVelocity = Vector3.SmoothDamp(currentNavVelocity, targetNavVelocity, ref _navmeshVelocitySmoothDamp, navmeshSmoothTime);
+
+                    rb.velocity = new Vector3(newNavVelocity.x, rb.velocity.y, newNavVelocity.z);
                 }
             }
         }
-        else // NPC
+        else // NPC (modalità NavMesh)
         {
             if (navAgent != null && navAgent.enabled)
             {
-                Vector3 targetPos = Vector3.Lerp(rb.position, navAgent.nextPosition, smoothFactorNavMesh * Time.fixedDeltaTime);
-                rb.MovePosition(targetPos);
+                Vector3 toTarget = navAgent.nextPosition - rb.position;
+                Vector3 desiredDir = toTarget.normalized;
+                float distance = toTarget.magnitude;
+                float factor = Mathf.Clamp01(distance);
+                Vector3 targetNavVelocity = desiredDir * navMeshSpeed * factor;
+
+                Vector3 currentNavVelocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+                Vector3 newNavVelocity = Vector3.SmoothDamp(currentNavVelocity, targetNavVelocity, ref _navmeshVelocitySmoothDamp, navmeshSmoothTime);
+
+                rb.velocity = new Vector3(newNavVelocity.x, rb.velocity.y, newNavVelocity.z);
             }
         }
 
         rb.angularVelocity = Vector3.zero;
     }
 
-    #region Input e Stato per il Player Keyboard/PointAndClick
+    #region Rotazione
+    // Rotazione per modalità Keyboard, aggiornata in FixedUpdate
+    private void RotateKeyboard()
+    {
+        // Per la tastiera usiamo la direzione in base alla velocità orizzontale (o la stored direction se in salto)
+        Vector3 direction = (isAirborne) ? storedMoveDirection : new Vector3(rb.velocity.x, 0, rb.velocity.z);
+        if (direction.sqrMagnitude > 0.01f)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(direction.normalized) * Quaternion.Euler(0, rotationOffset, 0);
+            // Usa Time.fixedDeltaTime per la rotazione in fisica
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, angularSpeed * Time.fixedDeltaTime);
+        }
+    }
+
+    // Rotazione per modalità NavMesh e per NPC, aggiornata in LateUpdate
+    private void RotateNavmesh()
+    {
+        Vector3 direction = Vector3.zero;
+        if (avatarType == AvatarType.Player)
+        {
+            if (movementType == MovementType.PointAndClick && navAgent != null)
+            {
+                if (navAgent.velocity.sqrMagnitude > 0.1f)
+                    direction = navAgent.velocity;
+            }
+        }
+        else // NPC
+        {
+            if (navAgent != null && navAgent.velocity.sqrMagnitude > 0.1f)
+                direction = navAgent.velocity;
+        }
+        if (direction.sqrMagnitude > 0.01f)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(direction.normalized) * Quaternion.Euler(0, rotationOffset, 0);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, angularSpeed * Time.deltaTime);
+        }
+    }
+    #endregion
+
+    #region Input e Stato per il Player (Keyboard / PointAndClick)
     private void HandleKeyboardInput()
     {
         currentState = moveInput.sqrMagnitude > 0.01f ? MovementState.Walking : MovementState.Idle;
@@ -361,8 +390,7 @@ public class AvatarController : MonoBehaviour
     {
         Vector3 randomDirection = Random.insideUnitSphere * patrolRadius;
         randomDirection += transform.position;
-        NavMeshHit hit;
-        if (NavMesh.SamplePosition(randomDirection, out hit, patrolRadius, NavMesh.AllAreas))
+        if (NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, patrolRadius, NavMesh.AllAreas))
         {
             navAgent.SetDestination(hit.position);
             Debug.Log("NPC nuova destinazione: " + hit.position);
@@ -371,7 +399,6 @@ public class AvatarController : MonoBehaviour
     #endregion
 
     #region Salto e Controllo del Terreno (Ground Check)
-    // Restituisce true se il controllo sfera (senza delay) rileva il terreno.
     public bool IsTouchingGround()
     {
         Vector3 sphereCenter = transform.position + Vector3.down * groundCheckOffset;
@@ -381,47 +408,9 @@ public class AvatarController : MonoBehaviour
 
     private Vector3 GetGroundNormal()
     {
-        RaycastHit hit;
-        float rayDistance = groundCheckOffset + groundCheckRadius + 0.2f;
-        if (Physics.Raycast(transform.position, Vector3.down, out hit, rayDistance, groundLayer))
-        {
+        if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, groundCheckOffset + groundCheckRadius + 0.2f, groundLayer))
             return hit.normal;
-        }
         return Vector3.up;
-    }
-    #endregion
-
-    #region Rotazione dell'Avatar
-    private void RotateInMovementDirection()
-    {
-        Vector3 direction = Vector3.zero;
-
-        if (avatarType == AvatarType.Player)
-        {
-            if (movementType == MovementType.Keyboard)
-            {
-                // Se siamo in movimento via tastiera, usiamo la velocità orizzontale attuale (oppure la stored direction se in salto)
-                direction = isAirborne ? storedMoveDirection : currentHorizontalVelocity;
-            }
-            else if (movementType == MovementType.PointAndClick && navAgent != null)
-            {
-                if (navAgent.velocity.sqrMagnitude > 0.1f)
-                    direction = navAgent.velocity;
-            }
-        }
-        else // NPC
-        {
-            if (navAgent != null && navAgent.velocity.sqrMagnitude > 0.1f)
-                direction = navAgent.velocity;
-        }
-
-        if (direction.sqrMagnitude > 0.01f)
-        {
-            // Calcola la rotazione target, applicando l'offset
-            Quaternion targetRotation = Quaternion.LookRotation(direction.normalized) * Quaternion.Euler(0, rotationOffset, 0);
-            // Ruota usando la velocità angolare configurata
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, angularSpeed * Time.deltaTime);
-        }
     }
     #endregion
 
@@ -465,7 +454,6 @@ public class AvatarController : MonoBehaviour
     #region Gestione Collisioni
     private void OnCollisionEnter(Collision collision)
     {
-        // Se la collisione è con il terreno o è una collisione laterale, resettare l'inertia.
         if (((1 << collision.gameObject.layer) & groundLayer) != 0)
         {
             isAirborne = false;
