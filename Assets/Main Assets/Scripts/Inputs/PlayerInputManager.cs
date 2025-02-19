@@ -7,6 +7,10 @@ public class PlayerInputManager : MonoBehaviour
     private PlayerInputActions inputActions;
     private AvatarController avatarController;
 
+    // Layer mask per le superfici target (per il raycast)
+    [Tooltip("Layer mask delle superfici target per il raycast. Gli oggetti che non appartengono a questi layer saranno ignorati.")]
+    [SerializeField] private LayerMask surfaceLayerMask;
+
     void Awake()
     {
         inputActions = new PlayerInputActions();
@@ -60,13 +64,16 @@ public class PlayerInputManager : MonoBehaviour
                 Vector2 mousePos = Mouse.current.position.ReadValue();
                 Ray ray = Camera.main.ScreenPointToRay(mousePos);
                 Debug.DrawRay(ray.origin, ray.direction * 100f, Color.green, 2f);
-                if (Physics.Raycast(ray, out RaycastHit hit))
+                // Esegue il raycast usando il layer mask per le superfici target
+                if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, surfaceLayerMask))
                 {
-                    Debug.Log("Click rilevato: destinazione " + hit.point);
+                    Debug.Log("Click rilevato su superficie target: destinazione " + hit.point);
                     avatarController.SetTargetPosition(hit.point);
                 }
                 else
-                    Debug.Log("Raycast non ha colpito nulla.");
+                {
+                    Debug.Log("Raycast non ha colpito una superficie target.");
+                }
             }
         }
     }

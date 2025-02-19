@@ -400,6 +400,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22f0927d64dad0e4f966769df3102bc4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  surfaceLayerMask:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!114 &255001826
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -413,22 +416,31 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   avatarType: 1
-  movementType: 0
+  movementType: 1
   keyboardSpeed: 6
   navMeshSpeed: 6
   jumpForce: 5
   rotationOffset: 0
+  acceleration: 10
+  deceleration: 10
+  angularSpeed: 360
+  airControlFactor: 0.5
+  inAirSmoothMultiplier: 3
   patrolRadius: 10
   waitTimeAtPatrolPoint: 2
+  patrolTimeout: 5
   smoothFactorNavMesh: 20
-  safetyMargin: 0.1
-  skinWidth: 0.05
-  sphereCastRadius: 0.5
-  groundCheckOffset: 0.1
-  groundCheckRadius: 0.2
+  safetyMargin: 0.3
+  skinWidth: 0.3
+  sphereCastRadius: 0.01
+  groundCheckOffset: 1
+  groundCheckRadius: 0.3
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 16385
+  groundedToFalseDelay: 0.3
+  falseToGroundedDelay: 0.3
+  minAirborneTime: 0.2
 --- !u!114 &255001827
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1618,6 +1630,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22f0927d64dad0e4f966769df3102bc4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  surfaceLayerMask:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!114 &812624847
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1631,22 +1646,31 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   avatarType: 1
-  movementType: 0
+  movementType: 1
   keyboardSpeed: 6
   navMeshSpeed: 6
   jumpForce: 5
   rotationOffset: 0
+  acceleration: 10
+  deceleration: 10
+  angularSpeed: 360
+  airControlFactor: 0.5
+  inAirSmoothMultiplier: 3
   patrolRadius: 10
   waitTimeAtPatrolPoint: 2
+  patrolTimeout: 5
   smoothFactorNavMesh: 20
-  safetyMargin: 0.1
-  skinWidth: 0.05
-  sphereCastRadius: 0.5
-  groundCheckOffset: 0.1
-  groundCheckRadius: 0.2
+  safetyMargin: 0.3
+  skinWidth: 0.3
+  sphereCastRadius: 0.01
+  groundCheckOffset: 1
+  groundCheckRadius: 0.3
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 16385
+  groundedToFalseDelay: 0.3
+  falseToGroundedDelay: 0.3
+  minAirborneTime: 0.2
 --- !u!114 &812624848
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1928,6 +1952,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22f0927d64dad0e4f966769df3102bc4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  surfaceLayerMask:
+    serializedVersion: 2
+    m_Bits: 16384
 --- !u!114 &981407518
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1946,8 +1973,14 @@ MonoBehaviour:
   navMeshSpeed: 6
   jumpForce: 5
   rotationOffset: 0
+  acceleration: 10
+  deceleration: 10
+  angularSpeed: 360
+  airControlFactor: 0.7
+  inAirSmoothMultiplier: 3
   patrolRadius: 10
   waitTimeAtPatrolPoint: 2
+  patrolTimeout: 5
   smoothFactorNavMesh: 20
   safetyMargin: 0.3
   skinWidth: 0.3
@@ -1956,7 +1989,10 @@ MonoBehaviour:
   groundCheckRadius: 0.3
   groundLayer:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 16385
+  groundedToFalseDelay: 0.3
+  falseToGroundedDelay: 0.3
+  minAirborneTime: 0.2
 --- !u!1 &1000762756
 GameObject:
   m_ObjectHideFlags: 0
@@ -1969,7 +2005,7 @@ GameObject:
   - component: {fileID: 1000762760}
   - component: {fileID: 1000762759}
   - component: {fileID: 1000762758}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: Wall (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2331,7 +2367,7 @@ GameObject:
   - component: {fileID: 1710448229}
   - component: {fileID: 1710448228}
   - component: {fileID: 1710448231}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: Ground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2450,6 +2486,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22f0927d64dad0e4f966769df3102bc4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  surfaceLayerMask:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!114 &1792011501
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2463,22 +2502,31 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   avatarType: 1
-  movementType: 0
+  movementType: 1
   keyboardSpeed: 6
   navMeshSpeed: 6
   jumpForce: 5
   rotationOffset: 0
+  acceleration: 10
+  deceleration: 10
+  angularSpeed: 360
+  airControlFactor: 0.5
+  inAirSmoothMultiplier: 3
   patrolRadius: 10
   waitTimeAtPatrolPoint: 2
+  patrolTimeout: 5
   smoothFactorNavMesh: 20
-  safetyMargin: 0.1
-  skinWidth: 0.05
-  sphereCastRadius: 0.5
-  groundCheckOffset: 0.1
-  groundCheckRadius: 0.2
+  safetyMargin: 0.3
+  skinWidth: 0.3
+  sphereCastRadius: 0.01
+  groundCheckOffset: 1
+  groundCheckRadius: 0.3
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 16385
+  groundedToFalseDelay: 0.3
+  falseToGroundedDelay: 0.3
+  minAirborneTime: 0.2
 --- !u!114 &1792011502
 MonoBehaviour:
   m_ObjectHideFlags: 0
