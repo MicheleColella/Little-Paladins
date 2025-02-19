@@ -15,20 +15,74 @@ MonoBehaviour:
   sceneDatasByGuid:
     keys:
     - 99c9720ab356a0642a771bea13969a05
+    - 
+    - 64e67ca20d18848429dd567d351e9746
+    - e3a4b724d578d4696a8ccd679e44174c
     values:
     - goDatasByGlobalId:
         keys:
         - GlobalObjectId_V1-2-99c9720ab356a0642a771bea13969a05-1803507580-0
         - GlobalObjectId_V1-2-99c9720ab356a0642a771bea13969a05-308509318-0
+        - GlobalObjectId_V1-2-99c9720ab356a0642a771bea13969a05-739289798-0
+        - GlobalObjectId_V1-2-99c9720ab356a0642a771bea13969a05-981407509-0
+        - GlobalObjectId_V1-2-99c9720ab356a0642a771bea13969a05-812624845-0
+        - GlobalObjectId_V1-2-99c9720ab356a0642a771bea13969a05-255001824-0
+        - GlobalObjectId_V1-2-99c9720ab356a0642a771bea13969a05-1792011499-0
         values:
         - iColor: 8
           icon: PreMatQuad
         - iColor: 2
           icon: PreMatQuad
+        - iColor: 4
+          icon: Terrain Icon
+        - iColor: 5
+          icon: AvatarMask On Icon
+        - iColor: 9
+          icon: AvatarMask On Icon
+        - iColor: 9
+          icon: AvatarMask On Icon
+        - iColor: 9
+          icon: AvatarMask On Icon
       goDatasByInstanceId:
-        keys: 0cb9ffff0cc6ffff
+        keys: 8e6c0000726c00009683000046830000a0b300000ab3000046b300006ab3000054b3000014ccf5ff56c6f5ff
         values:
         - iColor: 8
           icon: PreMatQuad
         - iColor: 2
           icon: PreMatQuad
+        - iColor: 8
+          icon: PreMatQuad
+        - iColor: 2
+          icon: PreMatQuad
+        - iColor: 8
+          icon: PreMatQuad
+        - iColor: 2
+          icon: PreMatQuad
+        - iColor: 4
+          icon: Terrain Icon
+        - iColor: 5
+          icon: AvatarMask On Icon
+        - iColor: 9
+          icon: AvatarMask On Icon
+        - iColor: 9
+          icon: AvatarMask On Icon
+        - iColor: 9
+          icon: AvatarMask On Icon
+    - goDatasByGlobalId:
+        keys: []
+        values: []
+      goDatasByInstanceId:
+        keys: 
+        values: []
+    - goDatasByGlobalId:
+        keys: []
+        values: []
+      goDatasByInstanceId:
+        keys: 
+        values: []
+    - goDatasByGlobalId:
+        keys: []
+        values: []
+      goDatasByInstanceId:
+        keys: 
+        values: []

@@ -43,6 +43,7 @@ public class AvatarController : MonoBehaviour
     // Componenti
     private Rigidbody rb;
     private NavMeshAgent navAgent;
+    // Manteniamo il riferimento alla camera per eventuali altre necessità
     private Transform camTransform;
 
     // Variabili input
@@ -54,16 +55,27 @@ public class AvatarController : MonoBehaviour
     private bool waiting = false;
     private float waitTimer = 0f;
 
-    private Vector3 lastNonZeroDirection = Vector3.forward;
     [SerializeField] private float smoothFactorNavMesh = 10f;
+
+    // Parametri per il controllo delle collisioni durante il movimento
+    [SerializeField] private float safetyMargin = 0.1f; // margine di sicurezza per non "incastrarsi"
+    [SerializeField] private float skinWidth = 0.05f;   // tolleranza per il collider
+    [SerializeField] private float sphereCastRadius = 0.5f; // raggio dello SphereCast (da regolare in base al collider)
+
+    // Parametri per il Ground Check (controllo se il player tocca il terreno)
+    [Header("Ground Check")]
+    [SerializeField] private float groundCheckOffset = 0.1f; // distanza in basso rispetto al centro del player
+    [SerializeField] private float groundCheckRadius = 0.2f; // raggio della sfera per il check
+    [SerializeField] private LayerMask groundLayer;          // layer considerati come terreno
 
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
         rb.isKinematic = false;
         rb.interpolation = RigidbodyInterpolation.Interpolate;
-
         rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+        // Impostiamo la modalità di collisione continua per evitare tunneling
+        rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 
         camTransform = Camera.main != null ? Camera.main.transform : null;
         navAgent = GetComponent<NavMeshAgent>();
@@ -122,24 +134,29 @@ public class AvatarController : MonoBehaviour
         {
             if (movementType == MovementType.Keyboard)
             {
-                // Calcola la direzione di movimento
-                Vector3 moveDir = Vector3.zero;
-                if (camTransform != null)
+                // Calcola il vettore di input (mappato con -moveInput.y, moveInput.x)
+                Vector3 moveDir = new Vector3(-moveInput.y, 0, moveInput.x).normalized;
+                // Ottieni la normale della superficie (se presente) per allineare il movimento alla pendenza
+                Vector3 groundNormal = GetGroundNormal();
+                // Proietta il vettore di movimento sul piano definito dalla normale rilevata
+                Vector3 adjustedMoveDir = Vector3.ProjectOnPlane(moveDir, groundNormal).normalized;
+
+                float moveDistance = keyboardSpeed * Time.fixedDeltaTime;
+                if (adjustedMoveDir.sqrMagnitude > 0)
                 {
-                    Vector3 camForward = camTransform.forward; camForward.y = 0; camForward.Normalize();
-                    Vector3 camRight = camTransform.right; camRight.y = 0; camRight.Normalize();
-                    moveDir = (camRight * moveInput.x + camForward * moveInput.y).normalized;
-                }
-                else
-                {
-                    moveDir = new Vector3(moveInput.x, 0, moveInput.y).normalized;
+                    // Utilizziamo uno SphereCast per verificare se il percorso è bloccato
+                    Ray sphereCastRay = new Ray(rb.position, adjustedMoveDir);
+                    if (Physics.SphereCast(sphereCastRay, sphereCastRadius, out RaycastHit hit, moveDistance + safetyMargin + skinWidth))
+                    {
+                        // Se la distanza rilevata è minore della distanza prevista, riduciamo il movimento
+                        moveDistance = Mathf.Max(0, hit.distance - safetyMargin - skinWidth);
+                    }
                 }
                 
-                Vector3 targetPos = rb.position + moveDir * keyboardSpeed * Time.fixedDeltaTime;
+                Vector3 targetPos = rb.position + adjustedMoveDir * moveDistance;
                 rb.MovePosition(targetPos);
 
-                
-                if (jumpInput && IsGrounded())
+                if (jumpInput && IsTouchingGround())
                 {
                     rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
                     jumpInput = false;
@@ -147,13 +164,12 @@ public class AvatarController : MonoBehaviour
             }
             else if (movementType == MovementType.PointAndClick)
             {
-                
                 if (navAgent != null && navAgent.enabled)
                 {
                     Vector3 targetPos = Vector3.Lerp(rb.position, navAgent.nextPosition, smoothFactorNavMesh * Time.fixedDeltaTime);
                     rb.MovePosition(targetPos);
 
-                    if (jumpInput && IsGrounded())
+                    if (jumpInput && IsTouchingGround())
                     {
                         rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
                         jumpInput = false;
@@ -161,7 +177,7 @@ public class AvatarController : MonoBehaviour
                 }
             }
         }
-        else
+        else // NPC
         {
             if (navAgent != null && navAgent.enabled)
             {
@@ -169,6 +185,9 @@ public class AvatarController : MonoBehaviour
                 rb.MovePosition(targetPos);
             }
         }
+
+        // Azzera l'angular velocity per evitare rotazioni indesiderate (ad esempio, per collisioni)
+        rb.angularVelocity = Vector3.zero;
     }
 
     #region Input e Stato per il Player Keyboard/PointAndClick
@@ -234,10 +253,32 @@ public class AvatarController : MonoBehaviour
     }
     #endregion
 
-    #region Salto e Controllo del Terreno
-    private bool IsGrounded()
+    #region Salto e Controllo del Terreno (Ground Check)
+    /// <summary>
+    /// Ritorna true se il player sta toccando il terreno, basandosi su un controllo con una sfera.
+    /// </summary>
+    public bool IsTouchingGround()
     {
-        return Physics.Raycast(transform.position, Vector3.down, 1.1f);
+        // Calcola il centro della sfera di controllo in basso rispetto al player
+        Vector3 sphereCenter = transform.position + Vector3.down * groundCheckOffset;
+        // Disegna la sfera in modalità debug (opzionale)
+        Debug.DrawRay(sphereCenter, Vector3.up * 0.1f, Color.red);
+        return Physics.CheckSphere(sphereCenter, groundCheckRadius, groundLayer);
+    }
+
+    /// <summary>
+    /// Esegue un raycast verso il basso per ottenere la normale della superficie.
+    /// Se non viene colpito nulla, ritorna Vector3.up.
+    /// </summary>
+    private Vector3 GetGroundNormal()
+    {
+        RaycastHit hit;
+        float rayDistance = groundCheckOffset + groundCheckRadius + 0.2f;
+        if (Physics.Raycast(transform.position, Vector3.down, out hit, rayDistance, groundLayer))
+        {
+            return hit.normal;
+        }
+        return Vector3.up;
     }
     #endregion
 
@@ -245,20 +286,14 @@ public class AvatarController : MonoBehaviour
     private void RotateInMovementDirection()
     {
         Vector3 direction = Vector3.zero;
+
+        // Calcolo della direzione in base al tipo di movimento
         if (avatarType == AvatarType.Player)
         {
             if (movementType == MovementType.Keyboard)
             {
-                if (camTransform != null)
-                {
-                    Vector3 camForward = camTransform.forward; camForward.y = 0; camForward.Normalize();
-                    Vector3 camRight = camTransform.right; camRight.y = 0; camRight.Normalize();
-                    direction = (camRight * moveInput.x + camForward * moveInput.y);
-                }
-                else
-                {
-                    direction = new Vector3(moveInput.x, 0, moveInput.y);
-                }
+                // Utilizziamo lo stesso mapping corretto per la rotazione
+                direction = new Vector3(-moveInput.y, 0, moveInput.x);
             }
             else if (movementType == MovementType.PointAndClick && navAgent != null)
             {
@@ -271,14 +306,13 @@ public class AvatarController : MonoBehaviour
             if (navAgent != null && navAgent.velocity.sqrMagnitude > 0.1f)
                 direction = navAgent.velocity;
         }
-        if (direction.sqrMagnitude < 0.01f)
-            direction = lastNonZeroDirection;
-        else
-            lastNonZeroDirection = direction;
-        if (direction.sqrMagnitude > 0.001f)
+
+        // Se c'è un input significativo, ruotiamo in quella direzione
+        if (direction.sqrMagnitude > 0.01f)
         {
+            Vector3 normalizedDirection = direction.normalized;
             float smoothFactor = 8f;
-            Quaternion targetRotation = Quaternion.LookRotation(direction) * Quaternion.Euler(0, rotationOffset, 0);
+            Quaternion targetRotation = Quaternion.LookRotation(normalizedDirection) * Quaternion.Euler(0, rotationOffset, 0);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * smoothFactor);
         }
     }
@@ -318,6 +352,19 @@ public class AvatarController : MonoBehaviour
             navAgent.SetDestination(targetPosition);
             Debug.Log("Destinazione impostata: " + targetPosition);
         }
+    }
+    #endregion
+
+    #region Gizmos
+    // Disegna il Gizmo per il Ground Check quando l'oggetto è selezionato in editor
+    private void OnDrawGizmosSelected()
+    {
+        // Calcola il centro della sfera di controllo per il ground check
+        Vector3 sphereCenter = transform.position + Vector3.down * groundCheckOffset;
+        // Imposta il colore del Gizmo
+        Gizmos.color = Color.green;
+        // Disegna una sfera (wire) che rappresenta l'area del ground check
+        Gizmos.DrawWireSphere(sphereCenter, groundCheckRadius);
     }
     #endregion
 }
