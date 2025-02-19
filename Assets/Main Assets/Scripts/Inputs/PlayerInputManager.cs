@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.AI;
 
 [RequireComponent(typeof(AvatarController))]
 public class PlayerInputManager : MonoBehaviour
@@ -65,8 +66,16 @@ public class PlayerInputManager : MonoBehaviour
                 Debug.DrawRay(ray.origin, ray.direction * 100f, Color.green, 2f);
                 if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, surfaceLayerMask))
                 {
-                    Debug.Log("Click rilevato su superficie target: destinazione " + hit.point);
-                    avatarController.SetTargetPosition(hit.point);
+                    // Assicuriamoci che il punto sia sulla NavMesh (se possibile)
+                    if (NavMesh.SamplePosition(hit.point, out NavMeshHit hitInfo, 1.0f, NavMesh.AllAreas))
+                    {
+                        Debug.Log("Click rilevato su superficie target: destinazione " + hitInfo.position);
+                        avatarController.SetTargetPosition(hitInfo.position);
+                    }
+                    else
+                    {
+                        Debug.Log("Il punto di click non è su una NavMesh valida.");
+                    }
                 }
                 else
                 {
