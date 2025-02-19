@@ -101,6 +101,7 @@ public class AvatarController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         rb.isKinematic = false;
         rb.interpolation = RigidbodyInterpolation.Interpolate;
+        // Blocchiamo le rotazioni su X e Z; la rotazione sull'asse Y la gestiamo via script
         rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
         rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 
@@ -120,7 +121,7 @@ public class AvatarController : MonoBehaviour
             if (movementType == MovementType.Keyboard && avatarType == AvatarType.Player)
             {
                 navAgent.enabled = false;
-                Debug.Log("Modalità Keyboard: NavMeshAgent disabilitato");
+                //Debug.Log("Modalità Keyboard: NavMeshAgent disabilitato");
             }
             else
             {
@@ -130,7 +131,7 @@ public class AvatarController : MonoBehaviour
                 navAgent.acceleration = acceleration;
                 navAgent.angularSpeed = angularSpeed;
                 navAgent.stoppingDistance = 0.1f;
-                Debug.Log("Modalità PointAndClick: NavMeshAgent abilitato (updatePosition=false)");
+                //Debug.Log("Modalità PointAndClick: NavMeshAgent abilitato (updatePosition=false)");
             }
         }
     }
@@ -245,6 +246,9 @@ public class AvatarController : MonoBehaviour
         {
             // NPC: eventuale salto o altre logiche in FixedUpdate (se necessario)
         }
+
+        // Azzeriamo la velocità angolare per evitare rotazioni indesiderate dovute a forze esterne
+        rb.angularVelocity = Vector3.zero;
     }
 
     #region Rotazione
@@ -351,7 +355,7 @@ public class AvatarController : MonoBehaviour
         if (NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, patrolRadius, NavMesh.AllAreas))
         {
             navAgent.SetDestination(hit.position);
-            Debug.Log("NPC nuova destinazione: " + hit.position);
+            //Debug.Log("NPC nuova destinazione: " + hit.position);
         }
     }
     #endregion
@@ -404,7 +408,7 @@ public class AvatarController : MonoBehaviour
         if (navAgent != null && navAgent.enabled)
         {
             navAgent.SetDestination(targetPosition);
-            Debug.Log("Destinazione impostata: " + targetPosition);
+            //Debug.Log("Destinazione impostata: " + targetPosition);
         }
     }
     #endregion
