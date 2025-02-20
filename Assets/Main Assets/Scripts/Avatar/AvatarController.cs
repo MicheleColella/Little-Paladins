@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.Events; // Aggiunto per gli UnityEvent
+using UnityEngine.Events;
 
 public enum MovementType { Keyboard, PointAndClick }
 public enum AvatarType { Player, NPC }
@@ -46,11 +46,7 @@ public class AvatarController : MonoBehaviour
     [Tooltip("Fattore di controllo in aria (0 = nessun controllo, 1 = controllo uguale a terra)")]
     [SerializeField] private float airControlFactor = 0.5f;
     private Vector3 _velocitySmoothDamp = Vector3.zero;
-    [Tooltip("Moltiplicatore per il tempo di smoothing in aria rispetto a terra")]
-    [SerializeField] private float inAirSmoothMultiplier = 3f;
-    [SerializeField] private float baseSmoothTime = 0.05f;
 
-    // Tempo per lo smoothing in modalità NavMesh
     [SerializeField] private float navmeshSmoothTime = 0.1f;
     private Vector3 _navmeshVelocitySmoothDamp = Vector3.zero;
 
@@ -75,7 +71,7 @@ public class AvatarController : MonoBehaviour
     private float jumpStartTime = 0f;
 
     // Stato dell'avatar
-    private MovementState currentState = MovementState.Idle;
+    public MovementState currentState = MovementState.Idle;
 
     // Componenti
     private Rigidbody rb;
@@ -86,6 +82,11 @@ public class AvatarController : MonoBehaviour
     private Vector2 moveInput;
     private bool jumpInput;
     private Vector3 targetPosition;
+
+    // Variabili per il movimento su piani inclinati
+    [Header("Inclined Plane Movement")]
+    [SerializeField] private float slopeClimbForce = 50f;
+    [SerializeField] private float slopeDescendForce = 50f;
 
     /// <summary>
     /// Determina il tipo di avatar in base alla presenza del componente NPCBehaviour.
@@ -156,7 +157,6 @@ public class AvatarController : MonoBehaviour
                 Vector3 agentTarget = navAgent.nextPosition;
                 Vector3 currentPos = rb.position;
                 Vector3 targetPos = new Vector3(agentTarget.x, currentPos.y, agentTarget.z);
-                // Transizione fluida
                 Vector3 smoothPos = Vector3.SmoothDamp(currentPos, targetPos, ref _navmeshVelocitySmoothDamp, navmeshSmoothTime);
                 rb.MovePosition(smoothPos);
             }
@@ -203,7 +203,7 @@ public class AvatarController : MonoBehaviour
                     isAirborne = true;
                     jumpStartTime = Time.time;
                     rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-                    OnJump?.Invoke(); // Evento invocato al salto
+                    OnJump?.Invoke();
                     jumpInput = false;
                 }
 
@@ -212,12 +212,30 @@ public class AvatarController : MonoBehaviour
 
                 float effectiveSpeed = isAirborne ? keyboardSpeed * airControlFactor : keyboardSpeed;
                 Vector3 targetVelocity = inputDir * effectiveSpeed;
-                float smoothTime = isAirborne ? baseSmoothTime * inAirSmoothMultiplier : baseSmoothTime;
+
                 Vector3 currentHorizontal = new Vector3(rb.velocity.x, 0, rb.velocity.z);
-                Vector3 newHorizontal = Vector3.SmoothDamp(currentHorizontal, targetVelocity, ref _velocitySmoothDamp, smoothTime);
+                Vector3 newHorizontal = Vector3.MoveTowards(currentHorizontal, targetVelocity, acceleration * Time.fixedDeltaTime);
 
                 Vector3 groundNormal = GetGroundNormal();
                 Vector3 adjustedVelocity = Vector3.ProjectOnPlane(newHorizontal, groundNormal);
+
+                #region Inclined Plane Movement
+                // Rileva l'inclinazione del piano
+                float slopeAngle = Vector3.Angle(groundNormal, Vector3.up);
+                if (slopeAngle > 1f) // Se il terreno è inclinato
+                {
+                    Vector3 uphillDir = Vector3.Cross(groundNormal, Vector3.Cross(Vector3.up, groundNormal)).normalized;
+                    float dot = Vector3.Dot(inputDir, uphillDir);
+                    if (dot > 0)
+                    {
+                        adjustedVelocity += uphillDir * slopeClimbForce * dot * Time.fixedDeltaTime;
+                    }
+                    else if (dot < 0)
+                    {
+                        adjustedVelocity += uphillDir * slopeDescendForce * dot * Time.fixedDeltaTime;
+                    }
+                }
+                #endregion
 
                 rb.velocity = new Vector3(adjustedVelocity.x, rb.velocity.y, adjustedVelocity.z);
 
@@ -232,7 +250,7 @@ public class AvatarController : MonoBehaviour
                     isAirborne = true;
                     jumpStartTime = Time.time;
                     rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-                    OnJump?.Invoke(); // Evento invocato al salto
+                    OnJump?.Invoke();
                     jumpInput = false;
                 }
             }
@@ -240,6 +258,14 @@ public class AvatarController : MonoBehaviour
         
         rb.angularVelocity = Vector3.zero;
     }
+
+    public float GetMaxSpeed()
+    {
+        // Se il movimento è da tastiera, restituisce keyboardSpeed,
+        // altrimenti (PointAndClick o NPC) restituisce navMeshSpeed.
+        return (MovementMode == MovementType.Keyboard) ? keyboardSpeed : navMeshSpeed;
+    }
+
 
     #region Rotazione
     private void RotateKeyboard()
@@ -270,14 +296,29 @@ public class AvatarController : MonoBehaviour
     #region Input per il Player
     private void HandleKeyboardInput()
     {
-        currentState = moveInput.sqrMagnitude > 0.01f ? MovementState.Walking : MovementState.Idle;
+        // Se l'avatar non tocca il terreno, lo stato è Jumping,
+        // altrimenti, in base all'input, è Walking o Idle.
+        if (!IsTouchingGround())
+        {
+            currentState = MovementState.Jumping;
+        }
+        else
+        {
+            currentState = moveInput.sqrMagnitude > 0.01f ? MovementState.Walking : MovementState.Idle;
+        }
     }
 
     private void HandlePointAndClickInput()
     {
-        if (!navAgent.pathPending &&
-            navAgent.remainingDistance <= navAgent.stoppingDistance &&
-            navAgent.desiredVelocity.sqrMagnitude < 0.01f)
+        // Se l'avatar non tocca il terreno, lo stato è Jumping,
+        // altrimenti si valuta il movimento dell'agente NavMesh.
+        if (!IsTouchingGround())
+        {
+            currentState = MovementState.Jumping;
+        }
+        else if (!navAgent.pathPending &&
+                 navAgent.remainingDistance <= navAgent.stoppingDistance &&
+                 navAgent.desiredVelocity.sqrMagnitude < 0.01f)
         {
             currentState = MovementState.Idle;
         }
@@ -345,7 +386,7 @@ public class AvatarController : MonoBehaviour
     {
         if (((1 << collision.gameObject.layer) & groundLayer) != 0)
         {
-            if (isAirborne) // Se era in salto, invoca l'evento di "atterraggio"
+            if (isAirborne)
             {
                 OnLand?.Invoke();
             }

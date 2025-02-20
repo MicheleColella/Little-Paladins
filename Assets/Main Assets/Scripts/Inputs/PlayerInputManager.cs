@@ -37,7 +37,6 @@ public class PlayerInputManager : MonoBehaviour
 
     private void OnMovePerformed(InputAction.CallbackContext context)
     {
-        // Operiamo solo se l'avatar è Player
         if (avatarController.AvatarType != AvatarType.Player) return;
         Vector2 move = context.ReadValue<Vector2>();
         avatarController.SetMoveInput(move);
@@ -73,12 +72,12 @@ public class PlayerInputManager : MonoBehaviour
                     }
                     else
                     {
-                        Debug.Log("Il punto di click non è su una NavMesh valida.");
+                        //Debug.Log("Il punto di click non è su una NavMesh valida.");
                     }
                 }
                 else
                 {
-                    Debug.Log("Raycast non ha colpito una superficie target.");
+                    //Debug.Log("Raycast non ha colpito una superficie target.");
                 }
             }
         }
