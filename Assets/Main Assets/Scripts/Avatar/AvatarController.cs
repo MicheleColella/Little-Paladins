@@ -56,7 +56,7 @@ public class AvatarController : MonoBehaviour
     [SerializeField] private float groundCheckRadius = 0.2f;
     [SerializeField] private LayerMask groundLayer;
 
-    // Ritardo per il Ground Check
+    // Parametri per il delay nel rilevamento del terreno
     [Header("Ground Check Delay")]
     [Tooltip("Delay (in secondi) per passare da grounded (true) a non grounded (false)")]
     [SerializeField] private float groundedToFalseDelay = 0.5f;
@@ -165,6 +165,7 @@ public class AvatarController : MonoBehaviour
         }
     }
 
+    // Sistema di delay per il rilevamento del terreno
     private void UpdateGroundedDelayedState()
     {
         bool currentCheck = IsTouchingGround();
@@ -207,6 +208,8 @@ public class AvatarController : MonoBehaviour
                     jumpInput = false;
                 }
 
+                // Se siamo in aria usiamo la direzione memorizzata,
+                // altrimenti l'input corrente
                 if (isAirborne)
                     inputDir = storedMoveDirection;
 
@@ -265,7 +268,6 @@ public class AvatarController : MonoBehaviour
         // altrimenti (PointAndClick o NPC) restituisce navMeshSpeed.
         return (MovementMode == MovementType.Keyboard) ? keyboardSpeed : navMeshSpeed;
     }
-
 
     #region Rotazione
     private void RotateKeyboard()
@@ -384,14 +386,20 @@ public class AvatarController : MonoBehaviour
     #region Gestione Collisioni
     private void OnCollisionEnter(Collision collision)
     {
+        // Se la collisione è con il terreno
         if (((1 << collision.gameObject.layer) & groundLayer) != 0)
         {
+            // Se stiamo atterrando dopo essere stati in aria, impostiamo subito la velocità orizzontale
             if (isAirborne)
             {
                 OnLand?.Invoke();
+                // Se c'è un input attivo, usiamo quello; altrimenti usiamo storedMoveDirection
+                Vector3 effectiveDirection = new Vector3(-moveInput.y, 0, moveInput.x).normalized;
+                if (effectiveDirection.sqrMagnitude < 0.01f)
+                    effectiveDirection = storedMoveDirection;
+                rb.velocity = new Vector3(effectiveDirection.x * keyboardSpeed, rb.velocity.y, effectiveDirection.z * keyboardSpeed);
             }
             isAirborne = false;
-            storedMoveDirection = Vector3.zero;
         }
         else
         {
@@ -402,9 +410,12 @@ public class AvatarController : MonoBehaviour
                     if (isAirborne)
                     {
                         OnLand?.Invoke();
+                        Vector3 effectiveDirection = new Vector3(-moveInput.y, 0, moveInput.x).normalized;
+                        if (effectiveDirection.sqrMagnitude < 0.01f)
+                            effectiveDirection = storedMoveDirection;
+                        rb.velocity = new Vector3(effectiveDirection.x * keyboardSpeed, rb.velocity.y, effectiveDirection.z * keyboardSpeed);
                     }
                     isAirborne = false;
-                    storedMoveDirection = Vector3.zero;
                     break;
                 }
             }
