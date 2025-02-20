@@ -8,7 +8,9 @@ public class NPCBehaviour : MonoBehaviour
 {
     [Header("Patrol Settings")]
     [SerializeField] private float patrolRadius = 10f;
-    [SerializeField] private float waitTimeAtPatrolPoint = 2f;
+    // Tempo di attesa al punto di patrolling random tra i due valori
+    [SerializeField] private float minWaitTimeAtPatrolPoint = 2f;
+    [SerializeField] private float maxWaitTimeAtPatrolPoint = 4f;
     [SerializeField] private float patrolTimeout = 5f;
 
     [Header("Focus Settings")]
@@ -25,6 +27,7 @@ public class NPCBehaviour : MonoBehaviour
     private float patrolTimer = 0f;
     private bool waiting = false;
     private float waitTimer = 0f;
+    private float currentWaitTime = 0f;
 
     // Variabili per il focus
     private int currentFocusCounter = 0;
@@ -41,7 +44,7 @@ public class NPCBehaviour : MonoBehaviour
         // Se siamo in focus, controlla la distanza dal player
         if (isFocused)
         {
-            // Se non abbiamo ancora il riferimento al player, lo cerchiamo (assicurati che il player abbia il tag "Player")
+            // Trova il player tramite tag se non ancora trovato
             if (playerTransform == null)
             {
                 GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
@@ -55,7 +58,6 @@ public class NPCBehaviour : MonoBehaviour
                 if (distance > maxFocusDistance)
                 {
                     ExitFocus();
-                    // Termina qui il frame
                     return;
                 }
             }
@@ -78,7 +80,7 @@ public class NPCBehaviour : MonoBehaviour
             return;
         }
 
-        // Comportamento di patrolling (già esistente)
+        // Comportamento di patrolling
         if (navAgent == null) return;
 
         if (!navAgent.pathPending && navAgent.remainingDistance <= navAgent.stoppingDistance && navAgent.desiredVelocity.sqrMagnitude < 0.01f)
@@ -87,11 +89,13 @@ public class NPCBehaviour : MonoBehaviour
             {
                 waiting = true;
                 waitTimer = 0f;
+                // Imposta un tempo di attesa casuale compreso tra i due valori configurabili
+                currentWaitTime = Random.Range(minWaitTimeAtPatrolPoint, maxWaitTimeAtPatrolPoint);
             }
             else
             {
                 waitTimer += Time.deltaTime;
-                if (waitTimer >= waitTimeAtPatrolPoint)
+                if (waitTimer >= currentWaitTime)
                 {
                     waiting = false;
                     SetNewPatrolDestination();
@@ -156,6 +160,16 @@ public class NPCBehaviour : MonoBehaviour
         SetNewPatrolDestination();
         OnExitFocus?.Invoke();
     }
+
+    // Metodo pubblico per il FocusManager per forzare l'uscita dal focus
+    public void ForceExitFocus()
+    {
+        if (isFocused)
+            ExitFocus();
+    }
+
+    // Proprietà pubblica per leggere lo stato di focus
+    public bool IsFocused => isFocused;
 
     private void OnDrawGizmosSelected()
     {
