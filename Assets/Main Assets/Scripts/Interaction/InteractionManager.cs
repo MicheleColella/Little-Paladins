@@ -7,10 +7,9 @@ public class InteractionManager : MonoBehaviour
     public static InteractionManager Instance { get; private set; }
 
     private Transform playerTransform;
-
     private List<InteractableObject> interactableObjects = new List<InteractableObject>();
     private InteractableObject nearestObject;
-
+    private InteractableObject lastNearestObject; // per tenere traccia del precedente nearest
     private PlayerInputActions inputActions;
 
     private void Awake()
@@ -18,7 +17,6 @@ public class InteractionManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-
             inputActions = new PlayerInputActions();
             inputActions.Player.Interact.performed += OnInteractPerformed;
         }
@@ -77,9 +75,11 @@ public class InteractionManager : MonoBehaviour
         float minDistance = float.MaxValue;
         nearestObject = null;
 
+        // Cerca l'oggetto più vicino entro il range
         foreach (var obj in interactableObjects)
         {
-            if (obj == null) continue;
+            if (obj == null)
+                continue;
 
             float distance = Vector3.Distance(playerTransform.position, obj.transform.position);
             if (distance < minDistance && distance <= obj.interactionRange)
@@ -89,12 +89,18 @@ public class InteractionManager : MonoBehaviour
             }
         }
 
-        foreach (var obj in interactableObjects)
+        // Se il nearest object è cambiato, invoca gli eventi solo per il nuovo (e per il precedente, se presente)
+        if (nearestObject != lastNearestObject)
         {
-            if (obj != null)
+            if (lastNearestObject != null)
             {
-                obj.SetChildActive(obj == nearestObject);
+                lastNearestObject.SetChildActive(false);
             }
+            if (nearestObject != null)
+            {
+                nearestObject.SetChildActive(true);
+            }
+            lastNearestObject = nearestObject;
         }
     }
 
