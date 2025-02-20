@@ -24,9 +24,8 @@ MonoBehaviour:
         - GlobalObjectId_V1-2-99c9720ab356a0642a771bea13969a05-1803507580-0
         - GlobalObjectId_V1-2-99c9720ab356a0642a771bea13969a05-308509318-0
         - GlobalObjectId_V1-2-99c9720ab356a0642a771bea13969a05-739289798-0
-        - GlobalObjectId_V1-2-99c9720ab356a0642a771bea13969a05-981407509-0
-        - GlobalObjectId_V1-2-99c9720ab356a0642a771bea13969a05-2038724649-0
         - GlobalObjectId_V1-2-99c9720ab356a0642a771bea13969a05-408436267-0
+        - GlobalObjectId_V1-2-99c9720ab356a0642a771bea13969a05-3349563415386107180-3349563413649937669
         values:
         - iColor: 8
           icon: PreMatQuad
@@ -34,14 +33,12 @@ MonoBehaviour:
           icon: PreMatQuad
         - iColor: 4
           icon: Terrain Icon
-        - iColor: 0
-          icon: 
-        - iColor: 5
-          icon: AvatarMask On Icon
         - iColor: 6
           icon: Favorite
+        - iColor: 5
+          icon: AvatarMask On Icon
       goDatasByInstanceId:
-        keys: b66b0000026b00003c6b0000546b0000ce6b0000ba6a0000246b0000506b00000a710100007001007c700100a07001002871010092a2010088a1010004a2010028a20100b0a201006afdf7ff
+        keys: 966b0000f26a0000446b00000c6b0000a2f9ffff
         values:
         - iColor: 8
           icon: PreMatQuad
@@ -49,38 +46,10 @@ MonoBehaviour:
           icon: PreMatQuad
         - iColor: 4
           icon: Terrain Icon
-        - iColor: 0
-          icon: 
-        - iColor: 5
-          icon: AvatarMask On Icon
-        - iColor: 9
-          icon: AvatarMask On Icon
-        - iColor: 9
-          icon: AvatarMask On Icon
-        - iColor: 9
-          icon: AvatarMask On Icon
-        - iColor: 8
-          icon: PreMatQuad
-        - iColor: 2
-          icon: PreMatQuad
-        - iColor: 4
-          icon: Terrain Icon
-        - iColor: 0
-          icon: 
-        - iColor: 5
-          icon: AvatarMask On Icon
-        - iColor: 8
-          icon: PreMatQuad
-        - iColor: 2
-          icon: PreMatQuad
-        - iColor: 4
-          icon: Terrain Icon
-        - iColor: 0
-          icon: 
-        - iColor: 5
-          icon: AvatarMask On Icon
         - iColor: 6
           icon: Favorite
+        - iColor: 5
+          icon: AvatarMask On Icon
     - goDatasByGlobalId:
         keys: []
         values: []

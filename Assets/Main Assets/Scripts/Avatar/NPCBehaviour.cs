@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Events;
 
 [RequireComponent(typeof(AvatarController))]
 [RequireComponent(typeof(NavMeshAgent))]
@@ -10,10 +11,25 @@ public class NPCBehaviour : MonoBehaviour
     [SerializeField] private float waitTimeAtPatrolPoint = 2f;
     [SerializeField] private float patrolTimeout = 5f;
 
+    [Header("Focus Settings")]
+    [Tooltip("Numero di chiamate per mantenere il focus prima di uscire dal focus")]
+    [SerializeField] private int focusThreshold = 1;
+    [Tooltip("Distanza massima dal player per mantenere il focus")]
+    [SerializeField] private float maxFocusDistance = 15f;
+    [Tooltip("Evento invocato ad ogni attivazione del focus (anche durante il focus)")]
+    public UnityEvent OnFocus;
+    [Tooltip("Evento invocato quando il NPC esce dal focus (sia per superamento soglia che per distanza)")]
+    public UnityEvent OnExitFocus;
+
     private NavMeshAgent navAgent;
     private float patrolTimer = 0f;
     private bool waiting = false;
     private float waitTimer = 0f;
+
+    // Variabili per il focus
+    private int currentFocusCounter = 0;
+    private bool isFocused = false;
+    private Transform playerTransform;
 
     void Awake()
     {
@@ -22,6 +38,47 @@ public class NPCBehaviour : MonoBehaviour
 
     void Update()
     {
+        // Se siamo in focus, controlla la distanza dal player
+        if (isFocused)
+        {
+            // Se non abbiamo ancora il riferimento al player, lo cerchiamo (assicurati che il player abbia il tag "Player")
+            if (playerTransform == null)
+            {
+                GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+                if (playerObj != null)
+                    playerTransform = playerObj.transform;
+            }
+            // Se il player è troppo lontano, esci dal focus
+            if (playerTransform != null)
+            {
+                float distance = Vector3.Distance(transform.position, playerTransform.position);
+                if (distance > maxFocusDistance)
+                {
+                    ExitFocus();
+                    // Termina qui il frame
+                    return;
+                }
+            }
+            
+            // Ferma il NavMeshAgent e ruota verso il player
+            if (navAgent != null)
+                navAgent.isStopped = true;
+
+            if (playerTransform != null)
+            {
+                Vector3 direction = (playerTransform.position - transform.position).normalized;
+                direction.y = 0;
+                if (direction.sqrMagnitude > 0.001f)
+                {
+                    Quaternion targetRotation = Quaternion.LookRotation(direction);
+                    transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, navAgent.angularSpeed * Time.deltaTime);
+                }
+            }
+            // Durante il focus il NPC non esegue il patrolling
+            return;
+        }
+
+        // Comportamento di patrolling (già esistente)
         if (navAgent == null) return;
 
         if (!navAgent.pathPending && navAgent.remainingDistance <= navAgent.stoppingDistance && navAgent.desiredVelocity.sqrMagnitude < 0.01f)
@@ -60,6 +117,50 @@ public class NPCBehaviour : MonoBehaviour
         if (NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, patrolRadius, NavMesh.AllAreas))
         {
             navAgent.SetDestination(hit.position);
+            navAgent.isStopped = false;
         }
+    }
+
+    /// <summary>
+    /// Funzione da chiamare per attivare il focus sul player.
+    /// Ad ogni chiamata viene invocato l'evento OnFocus.
+    /// Quando il contatore interno supera il focusThreshold il NPC esce dal focus e riprende il patrolling.
+    /// </summary>
+    public void TriggerFocus()
+    {
+        // Incrementa il contatore e invoca l'evento di focus
+        currentFocusCounter++;
+        OnFocus?.Invoke();
+
+        // Attiva il focus: blocca il patrolling e ruota verso il player
+        isFocused = true;
+        if (navAgent != null)
+            navAgent.isStopped = true;
+
+        // Se il contatore ha superato la soglia, esce dal focus
+        if (currentFocusCounter > focusThreshold)
+        {
+            ExitFocus();
+        }
+    }
+
+    /// <summary>
+    /// Metodo per uscire dal focus, invoca l'evento di uscita e resetta il contatore.
+    /// </summary>
+    private void ExitFocus()
+    {
+        currentFocusCounter = 0;
+        isFocused = false;
+        if (navAgent != null)
+            navAgent.isStopped = false;
+        SetNewPatrolDestination();
+        OnExitFocus?.Invoke();
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        // Disegna il raggio entro il quale il focus è attivo
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, maxFocusDistance);
     }
 }
