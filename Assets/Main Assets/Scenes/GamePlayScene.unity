@@ -9792,6 +9792,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 907052872580117603, guid: 0a092a13571e61744b937d27990b9c35,
+        type: 3}
+      propertyPath: m_BaseOffset
+      value: 0.9466
+      objectReference: {fileID: 0}
     - target: {fileID: 907052872580117610, guid: 0a092a13571e61744b937d27990b9c35,
         type: 3}
       propertyPath: m_RootOrder
@@ -9871,6 +9876,11 @@ PrefabInstance:
       propertyPath: audioSourceOBJ
       value: 
       objectReference: {fileID: 1280247127}
+    - target: {fileID: 3812875239196285591, guid: ba6f6668b6fc870438d670062b374de1,
+        type: 3}
+      propertyPath: m_BaseOffset
+      value: 0.9466
+      objectReference: {fileID: 0}
     - target: {fileID: 3812875239196285598, guid: ba6f6668b6fc870438d670062b374de1,
         type: 3}
       propertyPath: m_RootOrder
@@ -10015,6 +10025,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4157760599318118106, guid: ba8d4d52269518747a044e989e18f4c1,
+        type: 3}
+      propertyPath: m_BaseOffset
+      value: 0.9466
+      objectReference: {fileID: 0}
     - target: {fileID: 4157760599318118111, guid: ba8d4d52269518747a044e989e18f4c1,
         type: 3}
       propertyPath: OnJump.m_PersistentCalls.m_Calls.Array.data[0].m_Target
@@ -10089,6 +10104,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mage
       objectReference: {fileID: 0}
+    - target: {fileID: 4459333977865257567, guid: d9ac546c27f190a4397ad3ca47c4dede,
+        type: 3}
+      propertyPath: m_BaseOffset
+      value: 0.9466
+      objectReference: {fileID: 0}
     - target: {fileID: 7107781218897016778, guid: d9ac546c27f190a4397ad3ca47c4dede,
         type: 3}
       propertyPath: audioSourceOBJ
@@ -10108,6 +10128,11 @@ PrefabInstance:
       propertyPath: audioSourceOBJ
       value: 
       objectReference: {fileID: 1280247127}
+    - target: {fileID: 7462664476185379505, guid: 839e99d8ac1a4044e93257dc283bd3cf,
+        type: 3}
+      propertyPath: m_BaseOffset
+      value: 0.9466
+      objectReference: {fileID: 0}
     - target: {fileID: 7462664476185379529, guid: 839e99d8ac1a4044e93257dc283bd3cf,
         type: 3}
       propertyPath: m_Name
@@ -10242,6 +10267,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Druid
       objectReference: {fileID: 0}
+    - target: {fileID: 7774373394733754989, guid: 729bfed8617d41f41b05b50875f5d630,
+        type: 3}
+      propertyPath: m_BaseOffset
+      value: 0.9466
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 729bfed8617d41f41b05b50875f5d630, type: 3}
 --- !u!1001 &8154038050370203724
@@ -10255,6 +10285,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Engineer
+      objectReference: {fileID: 0}
+    - target: {fileID: 8154038049782548155, guid: 51fc3a1c1e5b0f045b8abfaa0f04587b,
+        type: 3}
+      propertyPath: m_BaseOffset
+      value: 0.9466
       objectReference: {fileID: 0}
     - target: {fileID: 8154038049782548156, guid: 51fc3a1c1e5b0f045b8abfaa0f04587b,
         type: 3}
