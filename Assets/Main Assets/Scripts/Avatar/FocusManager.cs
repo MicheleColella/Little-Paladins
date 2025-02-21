@@ -57,7 +57,8 @@ public class FocusManager : MonoBehaviour
 
     void OnGUI()
     {
-        // Mostra in GUI l'elenco degli NPC e il loro stato di focus
+        if (!DebugManager.DebugState) return; // Mostra OnGUI solo se DebugState è attivo
+
         string guiText = "NPC Focus List:\n";
         foreach (var npc in npcList)
         {

@@ -11,11 +11,19 @@ public class PlayerInputManager : MonoBehaviour
     [Tooltip("Layer mask delle superfici target per il raycast. Gli oggetti che non appartengono a questi layer saranno ignorati.")]
     [SerializeField] private LayerMask surfaceLayerMask;
 
+    // Flag per il controllo degli input: se false, il PlayerInputManager ignora l'input corrispondente.
+    public bool CanMove = true;     // Controlla Move e Click.
+    public bool CanInteract = true; // Controlla Interact.
+    public bool CanJump = true;     // Controlla Jump.
+
     void Awake()
     {
         inputActions = new PlayerInputActions();
         avatarController = GetComponent<AvatarController>();
     }
+
+    // Esponiamo l'istanza degli input per la consultazione da parte di altri script.
+    public PlayerInputActions InputActions => inputActions;
 
     void OnEnable()
     {
@@ -25,20 +33,22 @@ public class PlayerInputManager : MonoBehaviour
         inputActions.Player.Jump.performed += OnJumpPerformed;
         inputActions.Player.Click.performed += OnClickPerformed;
         inputActions.Player.Interact.performed += OnInteractPerformed;
+        // L'input Escape viene gestito esclusivamente in MenuManager.
     }
 
     void OnDisable()
     {
-        inputActions.Disable();
         inputActions.Player.Move.performed -= OnMovePerformed;
         inputActions.Player.Move.canceled -= OnMoveCanceled;
         inputActions.Player.Jump.performed -= OnJumpPerformed;
         inputActions.Player.Click.performed -= OnClickPerformed;
         inputActions.Player.Interact.performed -= OnInteractPerformed;
+        inputActions.Disable();
     }
 
     private void OnMovePerformed(InputAction.CallbackContext context)
     {
+        if (!CanMove) return;
         if (avatarController.AvatarType != AvatarType.Player) return;
         Vector2 move = context.ReadValue<Vector2>();
         avatarController.SetMoveInput(move);
@@ -46,18 +56,21 @@ public class PlayerInputManager : MonoBehaviour
 
     private void OnMoveCanceled(InputAction.CallbackContext context)
     {
+        if (!CanMove) return;
         if (avatarController.AvatarType != AvatarType.Player) return;
         avatarController.SetMoveInput(Vector2.zero);
     }
 
     private void OnJumpPerformed(InputAction.CallbackContext context)
     {
+        if (!CanJump) return;
         if (avatarController.AvatarType != AvatarType.Player) return;
         avatarController.SetJumpInput(true);
     }
 
     private void OnClickPerformed(InputAction.CallbackContext context)
     {
+        if (!CanMove) return;
         if (avatarController.AvatarType != AvatarType.Player) return;
         if (avatarController != null && avatarController.gameObject.activeInHierarchy)
         {
@@ -79,9 +92,19 @@ public class PlayerInputManager : MonoBehaviour
 
     private void OnInteractPerformed(InputAction.CallbackContext context)
     {
+        if (!CanInteract) return;
         if (InteractionManager.Instance != null)
         {
             InteractionManager.Instance.InteractWithNearestObject();
+        }
+    }
+
+    // Metodo per fermare il movimento corrente dell'avatar.
+    public void StopMovement()
+    {
+        if (avatarController != null)
+        {
+            avatarController.StopMovement();
         }
     }
 }

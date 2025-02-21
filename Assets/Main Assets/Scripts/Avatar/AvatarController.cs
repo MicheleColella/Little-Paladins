@@ -350,7 +350,9 @@ public class AvatarController : MonoBehaviour
     #region GUI Toggle (solo per il Player)
     private void OnGUI()
     {
+        if (!DebugManager.DebugState) return; // Mostra OnGUI solo se DebugState è attivo
         if (AvatarType != AvatarType.Player) return;
+        
         string buttonText = movementType == MovementType.Keyboard ? "Switch to PointAndClick" : "Switch to Keyboard";
         if (GUI.Button(new Rect(10, 10, 220, 40), buttonText))
         {
@@ -431,4 +433,21 @@ public class AvatarController : MonoBehaviour
         Gizmos.DrawWireSphere(sphereCenter, groundCheckRadius);
     }
     #endregion
+
+    // Metodo per fermare il movimento corrente dell'avatar.
+    public void StopMovement()
+    {
+        if (AvatarType != AvatarType.Player) return;
+        // In modalità PointAndClick, resetta il percorso del NavMeshAgent.
+        if (MovementMode == MovementType.PointAndClick && navAgent != null && navAgent.enabled)
+        {
+            navAgent.ResetPath();
+        }
+        // In modalità Keyboard, azzera l'input e la velocità orizzontale.
+        SetMoveInput(Vector2.zero);
+        if (rb != null)
+        {
+            rb.velocity = new Vector3(0, rb.velocity.y, 0);
+        }
+    }
 }
