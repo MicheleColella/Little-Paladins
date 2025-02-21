@@ -24,6 +24,7 @@ public class PlayerInputManager : MonoBehaviour
         inputActions.Player.Move.canceled += OnMoveCanceled;
         inputActions.Player.Jump.performed += OnJumpPerformed;
         inputActions.Player.Click.performed += OnClickPerformed;
+        inputActions.Player.Interact.performed += OnInteractPerformed;
     }
 
     void OnDisable()
@@ -33,6 +34,7 @@ public class PlayerInputManager : MonoBehaviour
         inputActions.Player.Move.canceled -= OnMoveCanceled;
         inputActions.Player.Jump.performed -= OnJumpPerformed;
         inputActions.Player.Click.performed -= OnClickPerformed;
+        inputActions.Player.Interact.performed -= OnInteractPerformed;
     }
 
     private void OnMovePerformed(InputAction.CallbackContext context)
@@ -70,16 +72,16 @@ public class PlayerInputManager : MonoBehaviour
                     {
                         avatarController.SetTargetPosition(hitInfo.position);
                     }
-                    else
-                    {
-                        //Debug.Log("Il punto di click non è su una NavMesh valida.");
-                    }
-                }
-                else
-                {
-                    //Debug.Log("Raycast non ha colpito una superficie target.");
                 }
             }
+        }
+    }
+
+    private void OnInteractPerformed(InputAction.CallbackContext context)
+    {
+        if (InteractionManager.Instance != null)
+        {
+            InteractionManager.Instance.InteractWithNearestObject();
         }
     }
 }

@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Collections.Generic;
-using UnityEngine.InputSystem;
 
 public class InteractionManager : MonoBehaviour
 {
@@ -10,30 +9,17 @@ public class InteractionManager : MonoBehaviour
     private List<InteractableObject> interactableObjects = new List<InteractableObject>();
     private InteractableObject nearestObject;
     private InteractableObject lastNearestObject; // per tenere traccia del precedente nearest
-    private PlayerInputActions inputActions;
 
     private void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
-            inputActions = new PlayerInputActions();
-            inputActions.Player.Interact.performed += OnInteractPerformed;
         }
         else
         {
             Destroy(gameObject);
         }
-    }
-
-    private void OnEnable()
-    {
-        inputActions.Enable();
-    }
-
-    private void OnDisable()
-    {
-        inputActions.Disable();
     }
 
     private void Update()
@@ -104,12 +90,9 @@ public class InteractionManager : MonoBehaviour
         }
     }
 
-    private void OnInteractPerformed(InputAction.CallbackContext context)
-    {
-        InteractWithNearestObject();
-    }
-
-    private void InteractWithNearestObject()
+    // Metodo pubblico per gestire l'interazione con l'oggetto più vicino,
+    // ora richiamato dal PlayerInputManager.
+    public void InteractWithNearestObject()
     {
         if (nearestObject != null)
         {
