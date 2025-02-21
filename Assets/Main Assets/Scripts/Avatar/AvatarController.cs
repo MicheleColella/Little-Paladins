@@ -191,14 +191,17 @@ public class AvatarController : MonoBehaviour
 
     private void RotateNavmesh()
     {
-        Vector3 dir = targetPosition - transform.position;
-        dir.y = 0;
-        if (dir.sqrMagnitude > 0.01f)
-        {
-            Quaternion targetRotation = Quaternion.LookRotation(dir.normalized) * Quaternion.Euler(0, rotationOffset, 0);
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, angularSpeed * Time.deltaTime);
-        }
+        // Se la velocità desiderata è trascurabile, non aggiornare la rotazione
+        if (navAgent.desiredVelocity.magnitude < 0.1f)
+            return;
+
+        Vector3 moveDirection = navAgent.desiredVelocity;
+        moveDirection.y = 0;
+        Quaternion targetRotation = Quaternion.LookRotation(moveDirection.normalized) * Quaternion.Euler(0, rotationOffset, 0);
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, angularSpeed * Time.deltaTime);
     }
+
+
 
     private void HandleKeyboardInput()
     {
