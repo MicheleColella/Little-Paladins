@@ -22,7 +22,6 @@ public class AvatarAnimationEvents : MonoBehaviour
 
     private void Update()
     {
-        // Se l'avatar ritrova il contatto con il terreno (dopo non averlo avuto) attiva OnLand.
         if (avatarController != null)
         {
             bool isGrounded = avatarController.IsTouchingGround();
@@ -34,10 +33,8 @@ public class AvatarAnimationEvents : MonoBehaviour
         }
     }
 
-    // Funzioni da invocare tramite Animation Events (da assegnare nell'Animator)
     public void RightFootStep()
     {
-        // Se l'avatar non tocca il pavimento, non invoca l'evento
         if (avatarController != null && !avatarController.IsTouchingGround())
             return;
         OnRightFootStep?.Invoke();
@@ -45,7 +42,6 @@ public class AvatarAnimationEvents : MonoBehaviour
 
     public void LeftFootStep()
     {
-        // Se l'avatar non tocca il pavimento, non invoca l'evento
         if (avatarController != null && !avatarController.IsTouchingGround())
             return;
         OnLeftFootStep?.Invoke();

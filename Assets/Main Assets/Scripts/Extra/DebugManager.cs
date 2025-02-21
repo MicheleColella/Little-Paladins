@@ -29,7 +29,7 @@ public class DebugManager : MonoBehaviour
 
     private void OnDropdownValueChanged(int index)
     {
-        // Assumiamo: indice 0 -> Keyboard, indice 1 -> PointAndClick
+        // 0 -> Keyboard, 1 -> PointAndClick
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
         {

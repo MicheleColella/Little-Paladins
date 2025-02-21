@@ -8,7 +8,7 @@ public class InteractionManager : MonoBehaviour
     private Transform playerTransform;
     private List<InteractableObject> interactableObjects = new List<InteractableObject>();
     private InteractableObject nearestObject;
-    private InteractableObject lastNearestObject; // per tenere traccia del precedente nearest
+    private InteractableObject lastNearestObject;
 
     private void Awake()
     {
@@ -24,7 +24,6 @@ public class InteractionManager : MonoBehaviour
 
     private void Update()
     {
-        // Se il riferimento al player non è stato ancora trovato, lo cerchiamo tramite tag
         if (playerTransform == null)
         {
             GameObject player = GameObject.FindGameObjectWithTag("Player");
@@ -75,7 +74,6 @@ public class InteractionManager : MonoBehaviour
             }
         }
 
-        // Se il nearest object è cambiato, invoca gli eventi solo per il nuovo (e per il precedente, se presente)
         if (nearestObject != lastNearestObject)
         {
             if (lastNearestObject != null)
@@ -89,9 +87,6 @@ public class InteractionManager : MonoBehaviour
             lastNearestObject = nearestObject;
         }
     }
-
-    // Metodo pubblico per gestire l'interazione con l'oggetto più vicino,
-    // ora richiamato dal PlayerInputManager.
     public void InteractWithNearestObject()
     {
         if (nearestObject != null)

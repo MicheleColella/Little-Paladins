@@ -23,7 +23,6 @@ public class AvatarController : MonoBehaviour
             if (AvatarType == AvatarType.NPC)
                 movementType = MovementType.PointAndClick;
             else {
-                // Se stiamo cambiando modalità e passiamo a PointAndClick,
                 // resettare targetPosition alla posizione attuale
                 if (movementType != value && value == MovementType.PointAndClick)
                 {

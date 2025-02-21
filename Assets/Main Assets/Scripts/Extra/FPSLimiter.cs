@@ -17,7 +17,6 @@ public class FPSLimiter : MonoBehaviour
             fpsLimit = Screen.currentResolution.refreshRate;
         }
 
-        // Applica il limite FPS
         Application.targetFrameRate = fpsLimit;
     }
 }

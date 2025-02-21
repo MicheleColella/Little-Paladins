@@ -12,7 +12,7 @@ public class MusicManager : MonoBehaviour
     public Slider volumeSlider;          // Gestisce il volume del Master Mixer
 
     [Header("Audio Components")]
-    public AudioSource audioSource;      // L'AudioSource su cui facciamo il fade
+    public AudioSource audioSource;      // L'AudioSource su cui viene effettuato il fade
     public AudioMixer audioMixer;        // Il Mixer su cui lo Slider agisce
     public string masterVolumeParam = "Master";
 
@@ -29,7 +29,6 @@ public class MusicManager : MonoBehaviour
 
     private void Start()
     {
-        // Popola il TMP_Dropdown con i nomi degli AudioClip
         musicDropdown.ClearOptions();
         List<string> options = new List<string>();
         foreach (AudioClip clip in musicClips)
@@ -38,7 +37,6 @@ public class MusicManager : MonoBehaviour
         }
         musicDropdown.AddOptions(options);
 
-        // Listener per cambio musica e cambio volume
         musicDropdown.onValueChanged.AddListener(OnDropdownValueChanged);
         volumeSlider.onValueChanged.AddListener(OnVolumeSliderChanged);
 
@@ -49,9 +47,9 @@ public class MusicManager : MonoBehaviour
         if (musicClips.Count > 0)
         {
             audioSource.clip = musicClips[0];
-            audioSource.volume = 1f;   // Volume AudioSource a 1 di default
+            audioSource.volume = 1f;
             audioSource.Play();
-            musicDropdown.value = 0;   // Imposta il dropdown sul primo elemento
+            musicDropdown.value = 0;
         }
     }
 
@@ -71,7 +69,7 @@ public class MusicManager : MonoBehaviour
     private void OnVolumeSliderChanged(float value)
     {
         if (isMuted)
-            return; // Se è mutato, non aggiornare il volume
+            return;
 
         float dB = -80f; 
         if (value > 0.0001f)
@@ -80,10 +78,9 @@ public class MusicManager : MonoBehaviour
         audioMixer.SetFloat(masterVolumeParam, dB);
     }
 
-    // Coroutine per il cambio brano con fade out/in sull’AudioSource.volume
     private IEnumerator ChangeMusic(AudioClip newClip)
     {
-        // FASE 1: FADE OUT (volume AudioSource da valore attuale a 0)
+        // FADE OUT
         float startVolume = audioSource.volume;
         float timer = 0f;
         while (timer < fadeDuration)
@@ -100,7 +97,7 @@ public class MusicManager : MonoBehaviour
         audioSource.clip = newClip;
         audioSource.Play();
 
-        // FASE 2: FADE IN (volume AudioSource da 0 a 1)
+        // FADE IN
         startVolume = 0f;
         timer = 0f;
         while (timer < fadeDuration)
@@ -115,16 +112,12 @@ public class MusicManager : MonoBehaviour
         audioSource.volume = 1f;
     }
 
-    // --- NUOVE FUNZIONI PER MUTO / UNMUTE ---
-
-    // Muta l'audio sul Master Mixer e imposta il flag isMuted a true
     public void MuteAudio()
     {
         isMuted = true;
         audioMixer.SetFloat(masterVolumeParam, -80f);
     }
 
-    // Ripristina l'audio in base allo slider e imposta il flag isMuted a false
     public void UnmuteAudio()
     {
         isMuted = false;

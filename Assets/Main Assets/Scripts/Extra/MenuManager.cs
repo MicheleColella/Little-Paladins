@@ -9,11 +9,7 @@ public class MenuManager : MonoBehaviour
 
     [Tooltip("Riferimento al PlayerInputManager, da assegnare via Inspector.")]
     [SerializeField] private PlayerInputManager playerInputManager;
-
-    // Evento Unity standard che verrà invocato quando il flag passa a true.
     public UnityEvent onEscapeStateChanged;
-
-    // Flag interno per il tasto Escape, gestito tramite proprietà.
     private bool _escapePressed = false;
     private bool EscapePressed
     {
@@ -23,7 +19,6 @@ public class MenuManager : MonoBehaviour
             if (_escapePressed != value)
             {
                 _escapePressed = value;
-                // Invoca l'evento solo quando il flag viene attivato (true).
                 if (_escapePressed)
                 {
                     onEscapeStateChanged?.Invoke();
@@ -34,13 +29,11 @@ public class MenuManager : MonoBehaviour
 
     void Update()
     {
-        // Se l'azione Escape viene attivata dal PlayerInputManager, imposta il flag a true.
         if (playerInputManager != null && playerInputManager.InputActions.Player.Escape.triggered)
         {
             EscapePressed = true;
         }
 
-        // Se il flag è attivo, esegue il toggle del menu e lo resetta.
         if (EscapePressed)
         {
             ToggleMenu();

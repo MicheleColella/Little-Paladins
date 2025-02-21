@@ -27,6 +27,7 @@ MonoBehaviour:
         - GlobalObjectId_V1-2-99c9720ab356a0642a771bea13969a05-408436267-0
         - GlobalObjectId_V1-2-99c9720ab356a0642a771bea13969a05-3349563415386107180-3349563413649937669
         - GlobalObjectId_V1-2-99c9720ab356a0642a771bea13969a05-442579474-0
+        - GlobalObjectId_V1-2-99c9720ab356a0642a771bea13969a05-4157760599318118100-4157760598337628609
         values:
         - iColor: 8
           icon: PreMatQuad
@@ -40,8 +41,10 @@ MonoBehaviour:
           icon: AvatarMask On Icon
         - iColor: 0
           icon: Canvas Icon
+        - iColor: 5
+          icon: AvatarMask On Icon
       goDatasByInstanceId:
-        keys: 966b0000f26a0000446b00000c6b0000a2f9ffff9e66feff
+        keys: 4a6d00003e6b0000106c0000766b00007af9ffffac6b00002e850200187f020006810200807f02009a7e0200d47f0200f6250300d4230300b4240300162403002cedf6ff5224030086ecf6ff
         values:
         - iColor: 8
           icon: PreMatQuad
@@ -55,6 +58,32 @@ MonoBehaviour:
           icon: AvatarMask On Icon
         - iColor: 0
           icon: Canvas Icon
+        - iColor: 8
+          icon: PreMatQuad
+        - iColor: 2
+          icon: PreMatQuad
+        - iColor: 4
+          icon: Terrain Icon
+        - iColor: 6
+          icon: Favorite
+        - iColor: 5
+          icon: AvatarMask On Icon
+        - iColor: 0
+          icon: Canvas Icon
+        - iColor: 8
+          icon: PreMatQuad
+        - iColor: 2
+          icon: PreMatQuad
+        - iColor: 4
+          icon: Terrain Icon
+        - iColor: 6
+          icon: Favorite
+        - iColor: 5
+          icon: AvatarMask On Icon
+        - iColor: 0
+          icon: Canvas Icon
+        - iColor: 5
+          icon: AvatarMask On Icon
     - goDatasByGlobalId:
         keys: []
         values: []

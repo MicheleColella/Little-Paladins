@@ -11,7 +11,6 @@ public class PlayerInputManager : MonoBehaviour
     [Tooltip("Layer mask delle superfici target per il raycast. Gli oggetti che non appartengono a questi layer saranno ignorati.")]
     [SerializeField] private LayerMask surfaceLayerMask;
 
-    // Flag per il controllo degli input: se false, il PlayerInputManager ignora l'input corrispondente.
     public bool CanMove = true;     // Controlla Move e Click.
     public bool CanInteract = true; // Controlla Interact.
     public bool CanJump = true;     // Controlla Jump.
@@ -22,7 +21,6 @@ public class PlayerInputManager : MonoBehaviour
         avatarController = GetComponent<AvatarController>();
     }
 
-    // Esponiamo l'istanza degli input per la consultazione da parte di altri script.
     public PlayerInputActions InputActions => inputActions;
 
     void OnEnable()
@@ -33,7 +31,6 @@ public class PlayerInputManager : MonoBehaviour
         inputActions.Player.Jump.performed += OnJumpPerformed;
         inputActions.Player.Click.performed += OnClickPerformed;
         inputActions.Player.Interact.performed += OnInteractPerformed;
-        // L'input Escape viene gestito esclusivamente in MenuManager.
     }
 
     void OnDisable()

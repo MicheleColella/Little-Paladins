@@ -10,12 +10,11 @@ public class FocusManager : MonoBehaviour
     [Header("Cinemachine Settings")]
     [SerializeField] private CinemachineVirtualCamera virtualCamera;
 
-    // Il player viene trovato direttamente dal tag "Player"
     private Transform playerTransform;
 
     void Awake()
     {
-        // Popola la lista con tutti gli NPCBehaviour presenti nella scena
+        // Riempe la lista con tutti gli NPCBehaviour presenti nella scena
         npcList = new List<NPCBehaviour>(FindObjectsOfType<NPCBehaviour>());
 
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
@@ -57,7 +56,7 @@ public class FocusManager : MonoBehaviour
 
     void OnGUI()
     {
-        if (!DebugManager.DebugState) return; // Mostra OnGUI solo se DebugState è attivo
+        if (!DebugManager.DebugState) return;
 
         string guiText = "NPC Focus List:\n";
         foreach (var npc in npcList)
