@@ -39,15 +39,13 @@ public class RandomSoundEmitter : MonoBehaviour
     [Header("Audio Source Settings")]
     [Tooltip("Se assegnato, questo AudioSource verrà usato come template per la configurazione")]
     public AudioSource audioSourceOBJ;
+    
+    [Tooltip("Se true, l'audio sarà 3D (spatialBlend=1); se false, sarà 2D (spatialBlend=0)")]
+    public bool audioIs3D = false;
 
     // Per evitare di riprodurre due volte di seguito lo stesso clip (se possibile)
     private SoundClip lastSoundClip;
 
-    /// <summary>
-    /// Riproduce un suono casuale dalla lista usando un nuovo GameObject dotato di AudioSource.
-    /// L'audiosource viene configurato copiando le impostazioni dal template audioSourceOBJ.
-    /// Il GameObject viene distrutto automaticamente al termine del clip.
-    /// </summary>
     public void PlayRandomSound()
     {
         if (soundClips == null || soundClips.Count == 0)
@@ -76,19 +74,16 @@ public class RandomSoundEmitter : MonoBehaviour
             return;
         }
 
-        // Crea un nuovo GameObject vuoto con un AudioSource
         GameObject audioGO = new GameObject("RandomSoundAudio");
         audioGO.transform.position = transform.position;
         AudioSource source = audioGO.AddComponent<AudioSource>();
         CopyAudioSourceSettings(audioSourceOBJ, source);
 
+        source.spatialBlend = audioIs3D ? 1f : 0f;
+
         // Calcola volume e pitch casuali
         float randomVolume = Random.Range(selectedSound.minVolume, selectedSound.maxVolume);
         float randomPitch = Random.Range(selectedSound.minPitch, selectedSound.maxPitch);
-
-        // Verifica i valori generati
-        //Debug.Log("RandomVolume generato: " + randomVolume);
-        //Debug.Log("RandomPitch generato: " + randomPitch);
 
         // Imposta il clip e i parametri
         source.clip = selectedSound.clip;
@@ -108,9 +103,6 @@ public class RandomSoundEmitter : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Copia alcune delle impostazioni dell'AudioSource template nel target.
-    /// </summary>
     private void CopyAudioSourceSettings(AudioSource template, AudioSource target)
     {
         target.outputAudioMixerGroup = template.outputAudioMixerGroup;
@@ -124,13 +116,8 @@ public class RandomSoundEmitter : MonoBehaviour
         target.bypassEffects = template.bypassEffects;
         target.bypassListenerEffects = template.bypassListenerEffects;
         target.bypassReverbZones = template.bypassReverbZones;
-        // Aggiungi altre proprietà se necessario
     }
 
-    /// <summary>
-    /// Coroutine che gestisce il fade out del suono secondo la curva specifica e distrugge il GameObject.
-    /// La durata del fade è data dall'ultima chiave della fadeCurve.
-    /// </summary>
     private IEnumerator FadeAndDestroy(AudioSource source, float baseVolume, AnimationCurve fadeCurve, UnityEvent clipEndEvent)
     {
         float fadeDuration = fadeCurve.keys[fadeCurve.keys.Length - 1].time;
@@ -149,10 +136,7 @@ public class RandomSoundEmitter : MonoBehaviour
         clipEndEvent?.Invoke();
         Destroy(source.gameObject);
     }
-
-    /// <summary>
-    /// Coroutine che attende la fine del clip per invocare l'evento di fine e distruggere il GameObject.
-    /// </summary>
+    
     private IEnumerator WaitAndDestroy(AudioSource source, UnityEvent clipEndEvent)
     {
         yield return new WaitForSeconds(source.clip.length);

@@ -42,6 +42,7 @@ public class NPCBehaviour : MonoBehaviour
     {
         if (isFocused)
         {
+            // Se il player non è stato ancora individuato, cerchiamolo tramite tag "Player"
             if (playerTransform == null)
             {
                 GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
@@ -68,6 +69,7 @@ public class NPCBehaviour : MonoBehaviour
                 if (direction.sqrMagnitude > 0.001f)
                 {
                     Quaternion targetRotation = Quaternion.LookRotation(direction);
+                    // Usa navAgent.angularSpeed per la velocità di rotazione
                     transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, navAgent.angularSpeed * Time.deltaTime);
                 }
             }
@@ -76,7 +78,7 @@ public class NPCBehaviour : MonoBehaviour
 
         if (navAgent == null) return;
 
-        // Se l'NPC ha raggiunto la destinazione, inizia la fase di attesa
+        // Gestione del patrol: se l'NPC ha raggiunto la destinazione, attende per un po'
         if (!navAgent.pathPending && navAgent.remainingDistance <= navAgent.stoppingDistance && navAgent.desiredVelocity.sqrMagnitude < 0.01f)
         {
             if (!waiting)
@@ -111,7 +113,8 @@ public class NPCBehaviour : MonoBehaviour
     }
 
     /// <summary>
-    /// Imposta una nuova destinazione di patrol scegliendo una posizione casuale ad una distanza compresa tra patrolMinRadius e patrolMaxRadius.
+    /// Imposta una nuova destinazione di patrol scegliendo una posizione casuale
+    /// ad una distanza compresa tra patrolMinRadius e patrolMaxRadius.
     /// </summary>
     private void SetNewPatrolDestination()
     {

@@ -146,9 +146,17 @@ public class AvatarController : MonoBehaviour
         // Gestione per gli NPC
         else if (AvatarType == AvatarType.NPC)
         {
-            // Per gli NPC si assume che il target sia gestito da un comportamento esterno.
-            // Qui, aggiorniamo la rotazione basandoci sulla velocità attuale del NavMeshAgent.
-            RotateNavmesh();
+            // Se è in focus, il NPCBehaviour gestirà la rotazione verso il player;
+            // altrimenti, usiamo la rotazione basata sulla velocità del NavMeshAgent.
+            NPCBehaviour npcBehavior = GetComponent<NPCBehaviour>();
+            if (npcBehavior != null && npcBehavior.IsFocused)
+            {
+                // Non interveniamo: NPCBehaviour aggiorna la rotazione
+            }
+            else
+            {
+                RotateNavmesh();
+            }
         }
     }
 
