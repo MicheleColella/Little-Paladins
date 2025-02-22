@@ -162,7 +162,7 @@ public class NPCBehaviour : MonoBehaviour
 
     public bool IsFocused => isFocused;
 
-    private void OnDrawGizmos()
+    private void OnDrawGizmosSelected()
     {
         if (navAgent != null)
         {

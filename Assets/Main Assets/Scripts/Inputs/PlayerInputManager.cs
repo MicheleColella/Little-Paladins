@@ -11,6 +11,9 @@ public class PlayerInputManager : MonoBehaviour
     [Tooltip("Layer mask delle superfici target per il raycast. Gli oggetti che non appartengono a questi layer saranno ignorati.")]
     [SerializeField] private LayerMask surfaceLayerMask;
 
+    [Tooltip("Prefab da istanziare nel punto di contatto del raycast.")]
+    [SerializeField] private GameObject targetPrefab;
+
     public bool CanMove = true;     // Controlla Move e Click.
     public bool CanInteract = true; // Controlla Interact.
     public bool CanJump = true;     // Controlla Jump.
@@ -80,7 +83,14 @@ public class PlayerInputManager : MonoBehaviour
                 {
                     if (NavMesh.SamplePosition(hit.point, out NavMeshHit hitInfo, 1.0f, NavMesh.AllAreas))
                     {
+                        // Imposta la destinazione per il movimento del player.
                         avatarController.SetTargetPosition(hitInfo.position);
+
+                        // Istanzia il targetPrefab nel punto di contatto.
+                        if (targetPrefab != null)
+                        {
+                            Instantiate(targetPrefab, hitInfo.position, Quaternion.identity);
+                        }
                     }
                 }
             }

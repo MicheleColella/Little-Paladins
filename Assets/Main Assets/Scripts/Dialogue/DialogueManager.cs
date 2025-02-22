@@ -18,16 +18,28 @@ public class DialogueManager : MonoBehaviour
     public GameObject dialogueContainer;
     [Tooltip("Componente TextMeshProUGUI dove verrà visualizzato il dialogo")]
     public TextMeshProUGUI dialogueText;
+    
+    [Header("Speaker Settings")]
+    [Tooltip("Nome del parlante, da impostare in Inspector")]
+    public string speakerName;
+    [Tooltip("TextMeshProUGUI per visualizzare il nome del parlante")]
+    public TextMeshProUGUI speakerNameText;
 
     [Header("Dialoghi")]
     [Tooltip("Lista dei dialoghi (la numerazione parte da 1)")]
     public List<DialogueData> dialogues = new List<DialogueData>();
+    
+    // Contatore interno del dialogo corrente: 0 = nessun dialogo attivo, altrimenti parte da 1
     private int currentDialogueIndex = 0;
+    
     public void OnFocusTriggered()
     {
         if (currentDialogueIndex == 0)
         {
             currentDialogueIndex = 1;
+            // Assegna il nome del parlante quando inizia il primo dialogo
+            if (speakerNameText != null)
+                speakerNameText.text = speakerName;
         }
         else
         {
@@ -54,5 +66,8 @@ public class DialogueManager : MonoBehaviour
     {
         currentDialogueIndex = 0;
         dialogueContainer.SetActive(false);
+        // Resetta il nome del parlante, se necessario
+        if (speakerNameText != null)
+            speakerNameText.text = "";
     }
 }

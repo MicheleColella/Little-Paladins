@@ -7,7 +7,6 @@ public class AvatarAnimationEvents : MonoBehaviour
     [Header("Animation Events")]
     public UnityEvent OnRightFootStep;
     public UnityEvent OnLeftFootStep;
-    public UnityEvent OnLand;
 
     [Header("Dependencies (opzionale)")]
     public AvatarController avatarController;
@@ -25,10 +24,6 @@ public class AvatarAnimationEvents : MonoBehaviour
         if (avatarController != null)
         {
             bool isGrounded = avatarController.IsTouchingGround();
-            if (!wasGrounded && isGrounded)
-            {
-                OnLand?.Invoke();
-            }
             wasGrounded = isGrounded;
         }
     }

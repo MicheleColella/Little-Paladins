@@ -279,14 +279,11 @@ public class AvatarController : MonoBehaviour
     {
         if (((1 << collision.gameObject.layer) & groundLayer) != 0)
         {
-            if (isAirborne)
-            {
-                OnLand?.Invoke();
-                Vector3 effectiveDirection = new Vector3(-moveInput.y, 0, moveInput.x).normalized;
-                if (effectiveDirection.sqrMagnitude < 0.01f)
-                    effectiveDirection = storedMoveDirection;
-                rb.velocity = new Vector3(effectiveDirection.x * keyboardSpeed, rb.velocity.y, effectiveDirection.z * keyboardSpeed);
-            }
+            OnLand?.Invoke();
+            Vector3 effectiveDirection = new Vector3(-moveInput.y, 0, moveInput.x).normalized;
+            if (effectiveDirection.sqrMagnitude < 0.01f)
+                effectiveDirection = storedMoveDirection;
+            rb.velocity = new Vector3(effectiveDirection.x * keyboardSpeed, rb.velocity.y, effectiveDirection.z * keyboardSpeed);
             isAirborne = false;
         }
         else
@@ -295,20 +292,18 @@ public class AvatarController : MonoBehaviour
             {
                 if (Vector3.Dot(contact.normal, Vector3.up) < 0.5f)
                 {
-                    if (isAirborne)
-                    {
-                        OnLand?.Invoke();
-                        Vector3 effectiveDirection = new Vector3(-moveInput.y, 0, moveInput.x).normalized;
-                        if (effectiveDirection.sqrMagnitude < 0.01f)
-                            effectiveDirection = storedMoveDirection;
-                        rb.velocity = new Vector3(effectiveDirection.x * keyboardSpeed, rb.velocity.y, effectiveDirection.z * keyboardSpeed);
-                    }
+                    OnLand?.Invoke();
+                    Vector3 effectiveDirection = new Vector3(-moveInput.y, 0, moveInput.x).normalized;
+                    if (effectiveDirection.sqrMagnitude < 0.01f)
+                        effectiveDirection = storedMoveDirection;
+                    rb.velocity = new Vector3(effectiveDirection.x * keyboardSpeed, rb.velocity.y, effectiveDirection.z * keyboardSpeed);
                     isAirborne = false;
                     break;
                 }
             }
         }
     }
+
 
     private void OnDrawGizmosSelected()
     {
