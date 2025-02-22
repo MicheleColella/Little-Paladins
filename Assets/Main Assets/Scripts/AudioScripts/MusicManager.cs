@@ -10,11 +10,15 @@ public class MusicManager : MonoBehaviour
     [Header("UI Components")]
     public TMP_Dropdown musicDropdown;   
     public Slider volumeSlider;          // Gestisce il volume del Master Mixer
+    public Slider sfxSlider;             // Gestisce il volume degli SFX
+    public Slider backgroundSlider;      // Gestisce il volume della Background Music
 
     [Header("Audio Components")]
     public AudioSource audioSource;      // L'AudioSource su cui viene effettuato il fade
-    public AudioMixer audioMixer;        // Il Mixer su cui lo Slider agisce
+    public AudioMixer audioMixer;        // Il Mixer su cui gli Slider agiscono
     public string masterVolumeParam = "Master";
+    public string sfxVolumeParam = "SFX";
+    public string backgroundVolumeParam = "Backgroundmusic";
 
     [Header("Music Clips")]
     public List<AudioClip> musicClips = new List<AudioClip>();
@@ -39,9 +43,13 @@ public class MusicManager : MonoBehaviour
 
         musicDropdown.onValueChanged.AddListener(OnDropdownValueChanged);
         volumeSlider.onValueChanged.AddListener(OnVolumeSliderChanged);
+        sfxSlider.onValueChanged.AddListener(OnSFXSliderChanged);
+        backgroundSlider.onValueChanged.AddListener(OnBackgroundSliderChanged);
 
-        // Inizializziamo il Mixer in base allo slider
+        // Inizializziamo il Mixer in base agli slider
         OnVolumeSliderChanged(volumeSlider.value);
+        OnSFXSliderChanged(sfxSlider.value);
+        OnBackgroundSliderChanged(backgroundSlider.value);
 
         // Se ci sono clip, avvia il primo all'inizio
         if (musicClips.Count > 0)
@@ -65,7 +73,7 @@ public class MusicManager : MonoBehaviour
         }
     }
 
-    // Lo slider regola il volume del Master del Mixer (solo se non è mutato)
+    // Regola il volume del Master Mixer (solo se non è mutato)
     private void OnVolumeSliderChanged(float value)
     {
         if (isMuted)
@@ -76,6 +84,26 @@ public class MusicManager : MonoBehaviour
             dB = Mathf.Log10(value) * 20f;
 
         audioMixer.SetFloat(masterVolumeParam, dB);
+    }
+
+    // Regola il volume degli SFX
+    private void OnSFXSliderChanged(float value)
+    {
+        float dB = -80f;
+        if (value > 0.0001f)
+            dB = Mathf.Log10(value) * 20f;
+
+        audioMixer.SetFloat(sfxVolumeParam, dB);
+    }
+
+    // Regola il volume della Background Music
+    private void OnBackgroundSliderChanged(float value)
+    {
+        float dB = -80f;
+        if (value > 0.0001f)
+            dB = Mathf.Log10(value) * 20f;
+
+        audioMixer.SetFloat(backgroundVolumeParam, dB);
     }
 
     private IEnumerator ChangeMusic(AudioClip newClip)
@@ -112,6 +140,7 @@ public class MusicManager : MonoBehaviour
         audioSource.volume = 1f;
     }
 
+    // Il pulsante mute/smute influenza solo il Master
     public void MuteAudio()
     {
         isMuted = true;
