@@ -7,7 +7,8 @@ using UnityEngine.Events;
 public class NPCBehaviour : MonoBehaviour
 {
     [Header("Patrol Settings")]
-    [SerializeField] private float patrolRadius = 10f;
+    [SerializeField] private float patrolMinRadius = 5f;    // Raggio minimo per il patrol
+    [SerializeField] private float patrolMaxRadius = 10f;   // Raggio massimo per il patrol
     [SerializeField] private float minWaitTimeAtPatrolPoint = 2f;
     [SerializeField] private float maxWaitTimeAtPatrolPoint = 4f;
     [SerializeField] private float patrolTimeout = 5f;
@@ -75,6 +76,7 @@ public class NPCBehaviour : MonoBehaviour
 
         if (navAgent == null) return;
 
+        // Se l'NPC ha raggiunto la destinazione, inizia la fase di attesa
         if (!navAgent.pathPending && navAgent.remainingDistance <= navAgent.stoppingDistance && navAgent.desiredVelocity.sqrMagnitude < 0.01f)
         {
             if (!waiting)
@@ -89,6 +91,8 @@ public class NPCBehaviour : MonoBehaviour
                 if (waitTimer >= currentWaitTime)
                 {
                     waiting = false;
+                    // Se l'agente sembra bloccato, resetta il path prima di impostare una nuova destinazione
+                    navAgent.ResetPath();
                     SetNewPatrolDestination();
                 }
             }
@@ -99,17 +103,28 @@ public class NPCBehaviour : MonoBehaviour
             if (patrolTimer >= patrolTimeout)
             {
                 patrolTimer = 0f;
+                waiting = false;
+                navAgent.ResetPath();
                 SetNewPatrolDestination();
             }
-            waiting = false;
         }
     }
 
+    /// <summary>
+    /// Imposta una nuova destinazione di patrol scegliendo una posizione casuale ad una distanza compresa tra patrolMinRadius e patrolMaxRadius.
+    /// </summary>
     private void SetNewPatrolDestination()
     {
-        Vector3 randomDirection = Random.insideUnitSphere * patrolRadius;
-        randomDirection += transform.position;
-        if (NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, patrolRadius, NavMesh.AllAreas))
+        // Seleziona un raggio casuale tra il minimo e il massimo
+        float randomRadius = Random.Range(patrolMinRadius, patrolMaxRadius);
+        // Genera una direzione casuale sul piano orizzontale
+        Vector3 randomDirection = Random.insideUnitSphere;
+        randomDirection.y = 0;
+        randomDirection = randomDirection.normalized * randomRadius;
+        Vector3 destination = transform.position + randomDirection;
+
+        // Verifica che la posizione sia raggiungibile sulla NavMesh
+        if (NavMesh.SamplePosition(destination, out NavMeshHit hit, patrolMaxRadius, NavMesh.AllAreas))
         {
             navAgent.SetDestination(hit.position);
             navAgent.isStopped = false;
@@ -155,5 +170,13 @@ public class NPCBehaviour : MonoBehaviour
             Gizmos.DrawSphere(navAgent.destination, 0.5f);
             Gizmos.DrawLine(transform.position, navAgent.destination);
         }
+
+        // Visualizza il raggio minimo in verde
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, patrolMinRadius);
+        
+        // Visualizza il raggio massimo in rosso
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, patrolMaxRadius);
     }
 }

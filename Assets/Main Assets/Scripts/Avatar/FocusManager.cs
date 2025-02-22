@@ -4,6 +4,8 @@ using Cinemachine;
 
 public class FocusManager : MonoBehaviour
 {
+    public static FocusManager Instance { get; private set; }  // Singleton
+
     [Header("NPC Focus List (visualizzazione in Inspector)")]
     [SerializeField] private List<NPCBehaviour> npcList = new List<NPCBehaviour>();
 
@@ -11,10 +13,15 @@ public class FocusManager : MonoBehaviour
     [SerializeField] private CinemachineVirtualCamera virtualCamera;
 
     private Transform playerTransform;
+    public NPCBehaviour CurrentFocusedNPC { get; private set; }  // NPC attualmente in focus
 
     void Awake()
     {
-        // Riempe la lista con tutti gli NPCBehaviour presenti nella scena
+        if (Instance != null && Instance != this)
+            Destroy(gameObject);
+        else
+            Instance = this;
+
         npcList = new List<NPCBehaviour>(FindObjectsOfType<NPCBehaviour>());
 
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
@@ -24,34 +31,26 @@ public class FocusManager : MonoBehaviour
 
     void Update()
     {
-        // Aggiorna la lista ogni frame per eventuali cambi dinamici (se necessario)
+        // Aggiorna la lista degli NPC
         npcList = new List<NPCBehaviour>(FindObjectsOfType<NPCBehaviour>());
 
-        // Controlla quanti NPC hanno il focus attivo
+        // Determina l’NPC in focus (se ce n’è più di uno, forziamo l’uscita a quelli in più)
         NPCBehaviour focusedNPC = null;
         foreach (var npc in npcList)
         {
             if (npc.IsFocused)
             {
                 if (focusedNPC == null)
-                {
-                    // Primo NPC trovato in focus
                     focusedNPC = npc;
-                }
                 else
-                {
-                    // Se ce n'è già uno in focus, forziamo l'uscita dal focus su questo NPC
                     npc.ForceExitFocus();
-                }
             }
         }
+        CurrentFocusedNPC = focusedNPC;
 
-        // Imposta il LookAt della virtual camera:
-        // Se c'è un NPC in focus, la camera lo guarda, altrimenti guarda il player
+        // Imposta il LookAt della virtual camera: se c'è un NPC in focus, la camera lo guarda, altrimenti il player
         if (virtualCamera != null)
-        {
-            virtualCamera.LookAt = focusedNPC != null ? focusedNPC.transform : playerTransform;
-        }
+            virtualCamera.LookAt = (CurrentFocusedNPC != null) ? CurrentFocusedNPC.transform : playerTransform;
     }
 
     void OnGUI()
