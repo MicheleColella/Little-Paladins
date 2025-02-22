@@ -23,7 +23,7 @@ public class AvatarController : MonoBehaviour
             if (AvatarType == AvatarType.NPC)
                 movementType = MovementType.PointAndClick;
             else {
-                // resettare targetPosition alla posizione attuale
+                // Resetta targetPosition alla posizione attuale se cambio modalità
                 if (movementType != value && value == MovementType.PointAndClick)
                 {
                     targetPosition = transform.position;
@@ -61,6 +61,7 @@ public class AvatarController : MonoBehaviour
     private bool isGroundedDelayed = true;
     private float groundedStateTimer = 0f;
 
+    // Il salto è attivato volontariamente
     private bool isAirborne = false;
     private Vector3 storedMoveDirection = Vector3.zero;
     private float jumpStartTime = 0f;
@@ -73,6 +74,9 @@ public class AvatarController : MonoBehaviour
     private Vector2 moveInput;
     private bool jumpInput;
     private Vector3 targetPosition;
+
+    // Per la gestione dell'ultima direzione valida (hysteresis)
+    private Vector3 lastNonZeroDirection = Vector3.zero;
 
     public AvatarType AvatarType {
         get { return GetComponent<NPCBehaviour>() != null ? AvatarType.NPC : AvatarType.Player; }
@@ -88,6 +92,9 @@ public class AvatarController : MonoBehaviour
 
         camTransform = Camera.main != null ? Camera.main.transform : null;
         navAgent = GetComponent<NavMeshAgent>();
+
+        // Disabilita la rotazione automatica del NavMeshAgent
+        navAgent.updateRotation = false;
 
         if (AvatarType == AvatarType.NPC)
             movementType = MovementType.PointAndClick;
@@ -117,6 +124,7 @@ public class AvatarController : MonoBehaviour
 
     void Update()
     {
+        // Gestione per il player
         if (AvatarType == AvatarType.Player)
         {
             if (movementType == MovementType.Keyboard)
@@ -127,9 +135,20 @@ public class AvatarController : MonoBehaviour
             else if (movementType == MovementType.PointAndClick)
             {
                 HandlePointAndClickInput();
-                navAgent.SetDestination(targetPosition);
+                // Imposta la destinazione solo se il target è cambiato significativamente
+                if (Vector3.Distance(navAgent.destination, targetPosition) > 0.1f)
+                {
+                    navAgent.SetDestination(targetPosition);
+                }
                 RotateNavmesh();
             }
+        }
+        // Gestione per gli NPC
+        else if (AvatarType == AvatarType.NPC)
+        {
+            // Per gli NPC si assume che il target sia gestito da un comportamento esterno.
+            // Qui, aggiorniamo la rotazione basandoci sulla velocità attuale del NavMeshAgent.
+            RotateNavmesh();
         }
     }
 
@@ -141,9 +160,16 @@ public class AvatarController : MonoBehaviour
         {
             Vector3 inputDir = new Vector3(-moveInput.y, 0, moveInput.x).normalized;
 
+            // Se il player non è a terra e non ha saltato volontariamente, non permettiamo il controllo in volo
+            if (!isGroundedDelayed && !isAirborne)
+            {
+                inputDir = Vector3.zero;
+            }
+
             if (isAirborne && jumpInput)
                 jumpInput = false;
 
+            // Attiva il salto solo se a terra
             if (!isAirborne && jumpInput && isGroundedDelayed)
             {
                 storedMoveDirection = inputDir;
@@ -154,6 +180,7 @@ public class AvatarController : MonoBehaviour
                 jumpInput = false;
             }
 
+            // Durante il salto, usa la direzione memorizzata
             if (isAirborne)
                 inputDir = storedMoveDirection;
 
@@ -189,19 +216,40 @@ public class AvatarController : MonoBehaviour
         }
     }
 
+    // Metodo di rotazione modificato per usare l'ultima direzione valida (hysteresis)
     private void RotateNavmesh()
     {
-        // Se la velocità desiderata è trascurabile, non aggiornare la rotazione
-        if (navAgent.desiredVelocity.magnitude < 0.1f)
+        // Blocca l'aggiornamento se il percorso è in attesa o se l'agente è praticamente fermo
+        if (navAgent.pathPending ||
+           (navAgent.remainingDistance <= navAgent.stoppingDistance + 0.05f && navAgent.velocity.sqrMagnitude < 0.001f))
+        {
             return;
+        }
 
-        Vector3 moveDirection = navAgent.desiredVelocity;
+        // Usa la velocità reale dell'agente e azzera la componente verticale
+        Vector3 moveDirection = navAgent.velocity;
         moveDirection.y = 0;
+
+        // Se la velocità è troppo bassa, usa l'ultima direzione valida per evitare oscillazioni
+        if (moveDirection.sqrMagnitude < 0.01f)
+        {
+            if (lastNonZeroDirection.sqrMagnitude < 0.01f)
+                return;
+            moveDirection = lastNonZeroDirection;
+        }
+        else
+        {
+            lastNonZeroDirection = moveDirection;
+        }
+
         Quaternion targetRotation = Quaternion.LookRotation(moveDirection.normalized) * Quaternion.Euler(0, rotationOffset, 0);
+        
+        // Aggiorna la rotazione solo se la differenza angolare è superiore a 1 grado
+        if (Quaternion.Angle(transform.rotation, targetRotation) < 1f)
+            return;
+        
         transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, angularSpeed * Time.deltaTime);
     }
-
-
 
     private void HandleKeyboardInput()
     {
@@ -241,37 +289,28 @@ public class AvatarController : MonoBehaviour
         return Vector3.up;
     }
 
-    private void OnGUI()
+    private void UpdateGroundedDelayedState()
     {
-        if (!DebugManager.DebugState) return;
-        if (AvatarType != AvatarType.Player) return;
-        
-        string buttonText = movementType == MovementType.Keyboard ? "Switch to PointAndClick" : "Switch to Keyboard";
-        if (GUI.Button(new Rect(10, 10, 220, 40), buttonText))
+        bool actualGrounded = IsTouchingGround();
+        if (actualGrounded != isGroundedDelayed)
         {
-            MovementMode = movementType == MovementType.Keyboard ? MovementType.PointAndClick : MovementType.Keyboard;
+            float requiredDelay = isGroundedDelayed ? groundedToFalseDelay : falseToGroundedDelay;
+            groundedStateTimer += Time.fixedDeltaTime;
+            if (groundedStateTimer >= requiredDelay)
+            {
+                bool previousGrounded = isGroundedDelayed;
+                isGroundedDelayed = actualGrounded;
+                groundedStateTimer = 0f;
+                if (!previousGrounded && isGroundedDelayed)
+                {
+                    OnLand?.Invoke();
+                    isAirborne = false;
+                }
+            }
         }
-    }
-
-    public void SetMoveInput(Vector2 input)
-    {
-        if (AvatarType != AvatarType.Player) return;
-        moveInput = input;
-    }
-
-    public void SetJumpInput(bool jump)
-    {
-        if (AvatarType != AvatarType.Player) return;
-        jumpInput = jump;
-    }
-
-    public void SetTargetPosition(Vector3 pos)
-    {
-        if (AvatarType != AvatarType.Player) return;
-        targetPosition = pos;
-        if (navAgent != null && navAgent.enabled)
+        else
         {
-            navAgent.SetDestination(targetPosition);
+            groundedStateTimer = 0f;
         }
     }
 
@@ -279,11 +318,10 @@ public class AvatarController : MonoBehaviour
     {
         if (((1 << collision.gameObject.layer) & groundLayer) != 0)
         {
-            OnLand?.Invoke();
-            Vector3 effectiveDirection = new Vector3(-moveInput.y, 0, moveInput.x).normalized;
-            if (effectiveDirection.sqrMagnitude < 0.01f)
-                effectiveDirection = storedMoveDirection;
-            rb.velocity = new Vector3(effectiveDirection.x * keyboardSpeed, rb.velocity.y, effectiveDirection.z * keyboardSpeed);
+            if (moveInput.sqrMagnitude < 0.01f)
+            {
+                rb.velocity = new Vector3(0, rb.velocity.y, 0);
+            }
             isAirborne = false;
         }
         else
@@ -292,18 +330,16 @@ public class AvatarController : MonoBehaviour
             {
                 if (Vector3.Dot(contact.normal, Vector3.up) < 0.5f)
                 {
-                    OnLand?.Invoke();
-                    Vector3 effectiveDirection = new Vector3(-moveInput.y, 0, moveInput.x).normalized;
-                    if (effectiveDirection.sqrMagnitude < 0.01f)
-                        effectiveDirection = storedMoveDirection;
-                    rb.velocity = new Vector3(effectiveDirection.x * keyboardSpeed, rb.velocity.y, effectiveDirection.z * keyboardSpeed);
+                    if (moveInput.sqrMagnitude < 0.01f)
+                    {
+                        rb.velocity = new Vector3(0, rb.velocity.y, 0);
+                    }
                     isAirborne = false;
                     break;
                 }
             }
         }
     }
-
 
     private void OnDrawGizmosSelected()
     {
@@ -326,22 +362,25 @@ public class AvatarController : MonoBehaviour
         }
     }
 
-    private void UpdateGroundedDelayedState()
+    public void SetMoveInput(Vector2 input)
     {
-        bool currentCheck = IsTouchingGround();
-        if (currentCheck != isGroundedDelayed)
+        if (AvatarType != AvatarType.Player) return;
+        moveInput = input;
+    }
+
+    public void SetJumpInput(bool jump)
+    {
+        if (AvatarType != AvatarType.Player) return;
+        jumpInput = jump;
+    }
+
+    public void SetTargetPosition(Vector3 pos)
+    {
+        if (AvatarType != AvatarType.Player) return;
+        targetPosition = pos;
+        if (navAgent != null && navAgent.enabled)
         {
-            float requiredDelay = isGroundedDelayed ? groundedToFalseDelay : falseToGroundedDelay;
-            groundedStateTimer += Time.fixedDeltaTime;
-            if (groundedStateTimer >= requiredDelay)
-            {
-                isGroundedDelayed = currentCheck;
-                groundedStateTimer = 0f;
-            }
-        }
-        else
-        {
-            groundedStateTimer = 0f;
+            navAgent.SetDestination(targetPosition);
         }
     }
 }
