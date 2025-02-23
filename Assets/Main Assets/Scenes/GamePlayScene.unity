@@ -9274,6 +9274,7 @@ GameObject:
   m_Component:
   - component: {fileID: 283593641}
   - component: {fileID: 283593640}
+  - component: {fileID: 283593642}
   m_Layer: 0
   m_Name: CM vcam1
   m_TagString: Untagged
@@ -9340,6 +9341,20 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 32.217, y: -90, z: 0}
+--- !u!114 &283593642
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 283593639}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa65ceb846a34f5408d03ab26b1a6ce4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minY: 10
+  maxY: 15
 --- !u!1001 &284517962
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -85147,6 +85162,11 @@ PrefabInstance:
       propertyPath: dialogues.Array.data[1].onDialogueAssigned.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1972592142}
+    - target: {fileID: 907052872580117603, guid: 0a092a13571e61744b937d27990b9c35,
+        type: 3}
+      propertyPath: m_BaseOffset
+      value: 0.945
+      objectReference: {fileID: 0}
     - target: {fileID: 907052872580117610, guid: 0a092a13571e61744b937d27990b9c35,
         type: 3}
       propertyPath: m_RootOrder
@@ -85658,7 +85678,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5828630091004436802}
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 38.76, y: -0.59, z: 26.67}
+  m_LocalPosition: {x: 38.76, y: -0.572, z: 26.67}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -85868,6 +85888,11 @@ PrefabInstance:
         type: 3}
       propertyPath: MaxDistance
       value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 3812875239196285591, guid: ba6f6668b6fc870438d670062b374de1,
+        type: 3}
+      propertyPath: m_BaseOffset
+      value: 0.945
       objectReference: {fileID: 0}
     - target: {fileID: 3812875239196285598, guid: ba6f6668b6fc870438d670062b374de1,
         type: 3}
@@ -86158,6 +86183,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Mage
+      objectReference: {fileID: 0}
+    - target: {fileID: 4459333977865257567, guid: d9ac546c27f190a4397ad3ca47c4dede,
+        type: 3}
+      propertyPath: m_BaseOffset
+      value: 0.945
       objectReference: {fileID: 0}
     - target: {fileID: 7107781218897016778, guid: d9ac546c27f190a4397ad3ca47c4dede,
         type: 3}
@@ -87207,6 +87237,11 @@ PrefabInstance:
       propertyPath: audioSourceOBJ
       value: 
       objectReference: {fileID: 1280247127}
+    - target: {fileID: 7462664476185379505, guid: 839e99d8ac1a4044e93257dc283bd3cf,
+        type: 3}
+      propertyPath: m_BaseOffset
+      value: 0.945
+      objectReference: {fileID: 0}
     - target: {fileID: 7462664476185379529, guid: 839e99d8ac1a4044e93257dc283bd3cf,
         type: 3}
       propertyPath: m_Name
@@ -87421,6 +87456,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Druid
       objectReference: {fileID: 0}
+    - target: {fileID: 7774373394733754989, guid: 729bfed8617d41f41b05b50875f5d630,
+        type: 3}
+      propertyPath: m_BaseOffset
+      value: 0.945
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 729bfed8617d41f41b05b50875f5d630, type: 3}
 --- !u!1 &7867922948754593762
@@ -87554,6 +87594,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Engineer
+      objectReference: {fileID: 0}
+    - target: {fileID: 8154038049782548155, guid: 51fc3a1c1e5b0f045b8abfaa0f04587b,
+        type: 3}
+      propertyPath: m_BaseOffset
+      value: 0.945
       objectReference: {fileID: 0}
     - target: {fileID: 8154038049782548156, guid: 51fc3a1c1e5b0f045b8abfaa0f04587b,
         type: 3}
