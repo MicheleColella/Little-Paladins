@@ -8,7 +8,7 @@ public class DialogueData
 {
     [TextArea]
     public string dialogueText;           // Testo del dialogo
-    public UnityEvent onDialogueAssigned; // Evento da invocare quando il dialogo viene assegnato
+    public UnityEvent onDialogueAssigned; // Evento quando il dialogo viene assegnato
 }
  
 public class DialogueManager : MonoBehaviour
@@ -37,7 +37,7 @@ public class DialogueManager : MonoBehaviour
         if (currentDialogueIndex == 0)
         {
             currentDialogueIndex = 1;
-            // Assegna il nome del parlante quando inizia il primo dialogo
+            
             if (speakerNameText != null)
                 speakerNameText.text = speakerName;
         }
@@ -51,12 +51,12 @@ public class DialogueManager : MonoBehaviour
             currentDialogueIndex = dialogues.Count;
         }
 
-        // Visualizza il dialogo corrispondente
         if (currentDialogueIndex > 0)
         {
             dialogueContainer.SetActive(true);
             DialogueData data = dialogues[currentDialogueIndex - 1];
             dialogueText.text = data.dialogueText;
+
             // Invoca l'evento specifico del dialogo
             data.onDialogueAssigned?.Invoke();
         }
@@ -66,7 +66,7 @@ public class DialogueManager : MonoBehaviour
     {
         currentDialogueIndex = 0;
         dialogueContainer.SetActive(false);
-        // Resetta il nome del parlante, se necessario
+        
         if (speakerNameText != null)
             speakerNameText.text = "";
     }

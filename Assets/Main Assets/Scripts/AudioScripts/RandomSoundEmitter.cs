@@ -6,44 +6,25 @@ using UnityEngine.Events;
 [System.Serializable]
 public class SoundClip
 {
-    [Tooltip("Clip Audio")]
     public AudioClip clip;
-
-    [Header("Clip Audio Settings")]
-    [Tooltip("Volume minimo casuale per questo clip")]
     public float minVolume = 0.5f;
-    [Tooltip("Volume massimo casuale per questo clip")]
     public float maxVolume = 1.0f;
-    [Tooltip("Pitch minimo casuale per questo clip")]
     public float minPitch = 0.8f;
-    [Tooltip("Pitch massimo casuale per questo clip")]
     public float maxPitch = 1.2f;
     
-    [Header("Fade Settings per il Clip")]
-    [Tooltip("Se impostato su true, viene applicato il fade out tramite la fadeCurve")]
     public bool useFade = true;
-    [Tooltip("Curva per regolare il fade out di questo clip. La durata del fade out è data dall'ultima chiave della curva.")]
     public AnimationCurve fadeCurve = AnimationCurve.Linear(0, 1, 1, 0);
 
-    [Header("Events per il Clip")]
     public UnityEvent OnSoundStart;
     public UnityEvent OnSoundEnd;
 }
 
 public class RandomSoundEmitter : MonoBehaviour
 {
-    [Header("Sound Clips Settings")]
-    [Tooltip("Lista dei SoundClip con le rispettive impostazioni")]
     public List<SoundClip> soundClips;
-
-    [Header("Audio Source Settings")]
-    [Tooltip("Se assegnato, questo AudioSource verrà usato come template per la configurazione")]
     public AudioSource audioSourceOBJ;
-    
-    [Tooltip("Se true, l'audio sarà 3D (spatialBlend=1); se false, sarà 2D (spatialBlend=0)")]
     public bool audioIs3D = false;
 
-    // Per evitare di riprodurre due volte di seguito lo stesso clip (se possibile)
     private SoundClip lastSoundClip;
 
     public void PlayRandomSound()
@@ -54,17 +35,11 @@ public class RandomSoundEmitter : MonoBehaviour
             return;
         }
 
-        SoundClip selectedSound;
+        SoundClip selectedSound = soundClips[Random.Range(0, soundClips.Count)];
         if (soundClips.Count > 1 && lastSoundClip != null)
         {
-            do
-            {
+            while (selectedSound == lastSoundClip)
                 selectedSound = soundClips[Random.Range(0, soundClips.Count)];
-            } while (selectedSound == lastSoundClip);
-        }
-        else
-        {
-            selectedSound = soundClips[Random.Range(0, soundClips.Count)];
         }
         lastSoundClip = selectedSound;
 
@@ -78,14 +53,11 @@ public class RandomSoundEmitter : MonoBehaviour
         audioGO.transform.position = transform.position;
         AudioSource source = audioGO.AddComponent<AudioSource>();
         CopyAudioSourceSettings(audioSourceOBJ, source);
-
         source.spatialBlend = audioIs3D ? 1f : 0f;
 
-        // Calcola volume e pitch casuali
         float randomVolume = Random.Range(selectedSound.minVolume, selectedSound.maxVolume);
         float randomPitch = Random.Range(selectedSound.minPitch, selectedSound.maxPitch);
 
-        // Imposta il clip e i parametri
         source.clip = selectedSound.clip;
         source.volume = randomVolume;
         source.pitch = randomPitch;
@@ -94,13 +66,9 @@ public class RandomSoundEmitter : MonoBehaviour
         selectedSound.OnSoundStart?.Invoke();
 
         if (selectedSound.useFade)
-        {
             StartCoroutine(FadeAndDestroy(source, randomVolume, selectedSound.fadeCurve, selectedSound.OnSoundEnd));
-        }
         else
-        {
             StartCoroutine(WaitAndDestroy(source, selectedSound.OnSoundEnd));
-        }
     }
 
     private void CopyAudioSourceSettings(AudioSource template, AudioSource target)

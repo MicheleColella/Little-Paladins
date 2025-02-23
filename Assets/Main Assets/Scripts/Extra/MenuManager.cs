@@ -10,34 +10,13 @@ public class MenuManager : MonoBehaviour
     [Tooltip("Riferimento al PlayerInputManager, da assegnare via Inspector.")]
     [SerializeField] private PlayerInputManager playerInputManager;
     public UnityEvent onEscapeStateChanged;
-    private bool _escapePressed = false;
-    private bool EscapePressed
-    {
-        get { return _escapePressed; }
-        set
-        {
-            if (_escapePressed != value)
-            {
-                _escapePressed = value;
-                if (_escapePressed)
-                {
-                    onEscapeStateChanged?.Invoke();
-                }
-            }
-        }
-    }
 
     void Update()
     {
         if (playerInputManager != null && playerInputManager.InputActions.Player.Escape.triggered)
         {
-            EscapePressed = true;
-        }
-
-        if (EscapePressed)
-        {
+            onEscapeStateChanged?.Invoke();
             ToggleMenu();
-            EscapePressed = false;
         }
     }
 
@@ -72,8 +51,6 @@ public class MenuManager : MonoBehaviour
             playerInputManager.CanMove = !menuActive;
             playerInputManager.CanJump = !menuActive;
             playerInputManager.CanInteract = !menuActive;
-            
-            // Se il movimento viene disabilitato, ferma immediatamente il movimento in corso.
             if (!playerInputManager.CanMove)
             {
                 playerInputManager.StopMovement();

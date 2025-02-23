@@ -11,7 +11,7 @@ public class FPSLimiter : MonoBehaviour
 
     void Awake()
     {
-        // Se l'opzione useRefreshRate è attiva, imposta il limite FPS al refresh rate corrente dello schermo
+        // Se l'opzione useRefreshRate è attiva, imposta il limite FPS al refresh rate dello schermo
         if (useRefreshRate)
         {
             fpsLimit = Screen.currentResolution.refreshRate;

@@ -13,25 +13,19 @@ public class InteractionManager : MonoBehaviour
     private void Awake()
     {
         if (Instance == null)
-        {
             Instance = this;
-        }
         else
-        {
             Destroy(gameObject);
-        }
+
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
+            playerTransform = player.transform;
     }
 
     private void Update()
     {
         if (playerTransform == null)
-        {
-            GameObject player = GameObject.FindGameObjectWithTag("Player");
-            if (player != null)
-            {
-                playerTransform = player.transform;
-            }
-        }
+            return;
 
         UpdateNearestObject();
     }
@@ -39,37 +33,29 @@ public class InteractionManager : MonoBehaviour
     public void RegisterInteractable(InteractableObject interactable)
     {
         if (!interactableObjects.Contains(interactable))
-        {
             interactableObjects.Add(interactable);
-        }
     }
 
     public void UnregisterInteractable(InteractableObject interactable)
     {
-        if (interactableObjects.Contains(interactable))
-        {
-            interactableObjects.Remove(interactable);
-        }
+        interactableObjects.Remove(interactable);
     }
 
     private void UpdateNearestObject()
     {
-        if (playerTransform == null)
-            return;
-
-        float minDistance = float.MaxValue;
+        float minSqrDistance = float.MaxValue;
         nearestObject = null;
 
-        // Cerca l'oggetto più vicino entro il range
         foreach (var obj in interactableObjects)
         {
             if (obj == null)
                 continue;
 
-            float distance = Vector3.Distance(playerTransform.position, obj.transform.position);
-            if (distance < minDistance && distance <= obj.interactionRange)
+            float sqrDistance = (playerTransform.position - obj.transform.position).sqrMagnitude;
+            float interactionRangeSqr = obj.interactionRange * obj.interactionRange;
+            if (sqrDistance < minSqrDistance && sqrDistance <= interactionRangeSqr)
             {
-                minDistance = distance;
+                minSqrDistance = sqrDistance;
                 nearestObject = obj;
             }
         }
@@ -77,21 +63,16 @@ public class InteractionManager : MonoBehaviour
         if (nearestObject != lastNearestObject)
         {
             if (lastNearestObject != null)
-            {
                 lastNearestObject.SetChildActive(false);
-            }
             if (nearestObject != null)
-            {
                 nearestObject.SetChildActive(true);
-            }
             lastNearestObject = nearestObject;
         }
     }
+
     public void InteractWithNearestObject()
     {
         if (nearestObject != null)
-        {
             nearestObject.Interact();
-        }
     }
 }

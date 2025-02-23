@@ -3,7 +3,6 @@ using UnityEngine;
 public class HeadIKController : MonoBehaviour
 {
     [Header("Riferimenti")]
-    public Animator animator;
     public Transform headIKTarget;  // Target IK per la testa
 
     [Header("Impostazioni Target")]
@@ -22,9 +21,6 @@ public class HeadIKController : MonoBehaviour
 
     void Start()
     {
-        if (animator == null)
-            animator = GetComponent<Animator>();
-
         if (headIKTarget != null)
         {
             defaultLocalPosition = headIKTarget.localPosition;

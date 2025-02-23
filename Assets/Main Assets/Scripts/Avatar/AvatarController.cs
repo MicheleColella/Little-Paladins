@@ -48,7 +48,6 @@ public class AvatarController : MonoBehaviour
     [SerializeField] private float acceleration = 10f;
     [SerializeField] private float angularSpeed = 360f;
     [SerializeField] private float airControlFactor = 0.5f;
-    private Vector3 _velocitySmoothDamp = Vector3.zero;
 
     [Header("Ground Check")]
     [SerializeField] private float groundCheckOffset = 0.1f;
@@ -64,12 +63,10 @@ public class AvatarController : MonoBehaviour
     // Il salto è attivato volontariamente
     private bool isAirborne = false;
     private Vector3 storedMoveDirection = Vector3.zero;
-    private float jumpStartTime = 0f;
     public MovementState currentState = MovementState.Idle;
 
     private Rigidbody rb;
     private NavMeshAgent navAgent;
-    private Transform camTransform;
 
     private Vector2 moveInput;
     private bool jumpInput;
@@ -90,7 +87,6 @@ public class AvatarController : MonoBehaviour
         rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
         rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 
-        camTransform = Camera.main != null ? Camera.main.transform : null;
         navAgent = GetComponent<NavMeshAgent>();
 
         // Disabilita la rotazione automatica del NavMeshAgent
@@ -182,7 +178,6 @@ public class AvatarController : MonoBehaviour
             {
                 storedMoveDirection = inputDir;
                 isAirborne = true;
-                jumpStartTime = Time.time;
                 rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
                 OnJump?.Invoke();
                 jumpInput = false;
@@ -355,6 +350,17 @@ public class AvatarController : MonoBehaviour
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(sphereCenter, groundCheckRadius);
     }
+
+    void OnGUI() {
+    if (AvatarType != AvatarType.Player || !DebugManager.DebugState)
+        return;
+
+    string debugInfo = "Movement Mode: " + MovementMode +
+                       "\nMovement State: " + currentState +
+                       "\nVelocity: " + rb.velocity.ToString("F2");
+
+    GUI.Label(new Rect(170, 65, 230, 80), debugInfo);
+}
 
     public void StopMovement()
     {

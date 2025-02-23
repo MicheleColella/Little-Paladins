@@ -24,18 +24,27 @@ MonoBehaviour:
         keys:
         - GlobalObjectId_V1-2-99c9720ab356a0642a771bea13969a05-1803507580-0
         - GlobalObjectId_V1-2-99c9720ab356a0642a771bea13969a05-308509318-0
-        - GlobalObjectId_V1-2-99c9720ab356a0642a771bea13969a05-739289798-0
         - GlobalObjectId_V1-2-99c9720ab356a0642a771bea13969a05-408436267-0
         - GlobalObjectId_V1-2-99c9720ab356a0642a771bea13969a05-442579474-0
         - GlobalObjectId_V1-2-99c9720ab356a0642a771bea13969a05-4157760599318118100-4157760598337628609
         - GlobalObjectId_V1-2-99c9720ab356a0642a771bea13969a05-1582737656-0
+        - GlobalObjectId_V1-2-99c9720ab356a0642a771bea13969a05-410087039-0
+        - GlobalObjectId_V1-2-99c9720ab356a0642a771bea13969a05-330585543-0
+        - GlobalObjectId_V1-2-99c9720ab356a0642a771bea13969a05-248830398-0
+        - GlobalObjectId_V1-2-99c9720ab356a0642a771bea13969a05-832575517-0
+        - GlobalObjectId_V1-2-99c9720ab356a0642a771bea13969a05-283593639-0
+        - GlobalObjectId_V1-2-99c9720ab356a0642a771bea13969a05-907052872580117611-907052872980859771
+        - GlobalObjectId_V1-2-99c9720ab356a0642a771bea13969a05-7462664476185379529-7462664475540210928
+        - GlobalObjectId_V1-2-99c9720ab356a0642a771bea13969a05-4459333977865257543-4459333977841950185
+        - GlobalObjectId_V1-2-99c9720ab356a0642a771bea13969a05-8154038049782548131-8154038050370203724
+        - GlobalObjectId_V1-2-99c9720ab356a0642a771bea13969a05-7774373394733754981-7774373396245943393
+        - GlobalObjectId_V1-2-99c9720ab356a0642a771bea13969a05-3812875239196285599-3812875238877626333
+        - GlobalObjectId_V1-2-99c9720ab356a0642a771bea13969a05-5828630091004436802-0
         values:
         - iColor: 8
           icon: PreMatQuad
         - iColor: 2
           icon: PreMatQuad
-        - iColor: 4
-          icon: Terrain Icon
         - iColor: 6
           icon: Favorite
         - iColor: 0
@@ -44,39 +53,61 @@ MonoBehaviour:
           icon: AvatarMask On Icon
         - iColor: 4
           icon: Terrain Icon
+        - iColor: 0
+          icon: DirectionalLight Icon
+        - iColor: 0
+          icon: Camera Icon
+        - iColor: 0
+          icon: 
+        - iColor: 0
+          icon: 
+        - iColor: 0
+          icon: Camera Icon
+        - iColor: 9
+          icon: AvatarMask On Icon
+        - iColor: 9
+          icon: AvatarMask On Icon
+        - iColor: 9
+          icon: AvatarMask On Icon
+        - iColor: 9
+          icon: AvatarMask On Icon
+        - iColor: 9
+          icon: AvatarMask On Icon
+        - iColor: 9
+          icon: AvatarMask On Icon
+        - iColor: 7
+          icon: AvatarMask On Icon
       goDatasByInstanceId:
-        keys: 706d00004c6b00002e6c00008e6b0000cc6b00006af9ffffcc7d0000a87b00008a7c0000ea7b0000287c00009ee9ffffeedd0000c4db0000a6dc000006dc000044dc00004a48fdffa0d6fcff
+        keys: 227c0000ba6e0000d26f00002a70000084cfffffde790000e4e30a002ad70a002ed80a0086d80a009ecffbffbee10a00d47d0b00f04e0b00e4510b00d0520b00965f0b00fa740b00fe510b009c4f0b005c4d0b00d65d0b00184e0b00284f0b00d0600b00664a0b0074670b00a2470b00825e0b00608a0b00
         values:
         - iColor: 8
           icon: PreMatQuad
         - iColor: 2
           icon: PreMatQuad
-        - iColor: 4
-          icon: Terrain Icon
         - iColor: 6
           icon: Favorite
         - iColor: 0
           icon: Canvas Icon
         - iColor: 5
           icon: AvatarMask On Icon
+        - iColor: 4
+          icon: Terrain Icon
         - iColor: 8
           icon: PreMatQuad
         - iColor: 2
           icon: PreMatQuad
-        - iColor: 4
-          icon: Terrain Icon
         - iColor: 6
           icon: Favorite
         - iColor: 0
           icon: Canvas Icon
         - iColor: 5
           icon: AvatarMask On Icon
+        - iColor: 4
+          icon: Terrain Icon
         - iColor: 8
           icon: PreMatQuad
         - iColor: 2
           icon: PreMatQuad
-        - iColor: 4
-          icon: Terrain Icon
         - iColor: 6
           icon: Favorite
         - iColor: 0
@@ -85,6 +116,30 @@ MonoBehaviour:
           icon: AvatarMask On Icon
         - iColor: 4
           icon: Terrain Icon
+        - iColor: 0
+          icon: DirectionalLight Icon
+        - iColor: 0
+          icon: Camera Icon
+        - iColor: 0
+          icon: 
+        - iColor: 0
+          icon: 
+        - iColor: 0
+          icon: Camera Icon
+        - iColor: 9
+          icon: AvatarMask On Icon
+        - iColor: 9
+          icon: AvatarMask On Icon
+        - iColor: 9
+          icon: AvatarMask On Icon
+        - iColor: 9
+          icon: AvatarMask On Icon
+        - iColor: 9
+          icon: AvatarMask On Icon
+        - iColor: 9
+          icon: AvatarMask On Icon
+        - iColor: 7
+          icon: AvatarMask On Icon
     - goDatasByGlobalId:
         keys: []
         values: []

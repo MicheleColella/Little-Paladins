@@ -34,7 +34,7 @@ public class FocusManager : MonoBehaviour
         // Aggiorna la lista degli NPC
         npcList = new List<NPCBehaviour>(FindObjectsOfType<NPCBehaviour>());
 
-        // Determina l’NPC in focus (se ce n’è più di uno, forziamo l’uscita a quelli in più)
+        // Determina l’NPC in focus
         NPCBehaviour focusedNPC = null;
         foreach (var npc in npcList)
         {
