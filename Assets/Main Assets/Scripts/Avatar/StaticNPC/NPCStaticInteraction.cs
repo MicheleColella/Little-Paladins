@@ -10,6 +10,12 @@ public class NPCStaticInteraction : MonoBehaviour
     public UnityEvent onActivated;
     public UnityEvent onDeactivated;
 
+    private void Start()
+    {
+        npcAudioSource.Play();
+        npcAudioSource.Pause();
+    }
+
     public void Toggle()
     {
         bool currentState = npcAnimator.GetBool(boolParameterName);
@@ -18,11 +24,11 @@ public class NPCStaticInteraction : MonoBehaviour
 
         if (npcAudioSource.isPlaying)
         {
-            npcAudioSource.Stop();
+            npcAudioSource.Pause();
         }
         else
         {
-            npcAudioSource.Play();
+            npcAudioSource.UnPause();
         }
 
         if (newState)
