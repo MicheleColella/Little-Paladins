@@ -15475,6 +15475,43 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 4157760599323255936}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &925355531
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2780695517283060579}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fff0960ef4ea6e04eac66b4a7fd2189d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_RigLayers:
+  - m_Rig: {fileID: 664966211}
+    m_Active: 1
+  m_Effectors: []
+--- !u!114 &925355532
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2780695517283060579}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a33cce7b2ee9564b9195b5ddfb81f57, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  headIKTarget: {fileID: 2073154592}
+  targetLayer:
+    serializedVersion: 2
+    m_Bits: 2048
+  searchRadius: 4
+  minSearchRadius: 1.8
+  fieldOfView: 116
+  targetSmoothSpeed: 5
+  defaultSmoothSpeed: 20
 --- !u!114 &1715694512462549513
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15542,44 +15579,6 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
   avatarController: {fileID: 4157760599318118111}
---- !u!114 &925355531
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2780695517283060579}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fff0960ef4ea6e04eac66b4a7fd2189d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_RigLayers:
-  - m_Rig: {fileID: 664966211}
-    m_Active: 1
-  m_Effectors: []
---- !u!114 &925355532
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2780695517283060579}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a33cce7b2ee9564b9195b5ddfb81f57, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  animator: {fileID: 8163037762964661615}
-  headIKTarget: {fileID: 2073154592}
-  targetLayer:
-    serializedVersion: 2
-    m_Bits: 2048
-  searchRadius: 4
-  minSearchRadius: 1.8
-  fieldOfView: 116
-  targetSmoothSpeed: 5
-  defaultSmoothSpeed: 20
 --- !u!4 &3007716001431297387 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1157100718060288491, guid: d035779bf520f38499966b00a58bd75f,

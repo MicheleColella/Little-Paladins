@@ -9327,7 +9327,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 283593639}
-  m_LocalRotation: {x: 0.19618917, y: -0.6793452, z: 0.19618917, w: 0.6793452}
+  m_LocalRotation: {x: 0.19618918, y: -0.6793452, z: 0.19618917, w: 0.6793452}
   m_LocalPosition: {x: 16.1, y: 10.33, z: 6.2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -11846,7 +11846,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
-  m_LocalRotation: {x: 0.19618917, y: -0.6793452, z: 0.19618917, w: 0.6793452}
+  m_LocalRotation: {x: 0.19618918, y: -0.6793452, z: 0.19618917, w: 0.6793452}
   m_LocalPosition: {x: 16.1, y: 10.33, z: 6.2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -85162,11 +85162,6 @@ PrefabInstance:
       propertyPath: dialogues.Array.data[1].onDialogueAssigned.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1972592142}
-    - target: {fileID: 907052872580117603, guid: 0a092a13571e61744b937d27990b9c35,
-        type: 3}
-      propertyPath: m_BaseOffset
-      value: 0.945
-      objectReference: {fileID: 0}
     - target: {fileID: 907052872580117610, guid: 0a092a13571e61744b937d27990b9c35,
         type: 3}
       propertyPath: m_RootOrder
@@ -85227,21 +85222,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Rogue
       objectReference: {fileID: 0}
-    - target: {fileID: 7477861877180007561, guid: 0a092a13571e61744b937d27990b9c35,
-        type: 3}
-      propertyPath: MaxDistance
-      value: 10
-      objectReference: {fileID: 0}
     - target: {fileID: 7477861877332866198, guid: 0a092a13571e61744b937d27990b9c35,
         type: 3}
       propertyPath: audioSourceOBJ
       value: 
       objectReference: {fileID: 1280247127}
-    - target: {fileID: 7477861877332866199, guid: 0a092a13571e61744b937d27990b9c35,
-        type: 3}
-      propertyPath: MaxDistance
-      value: 10
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0a092a13571e61744b937d27990b9c35, type: 3}
 --- !u!4 &1061661752676264134
@@ -85874,26 +85859,11 @@ PrefabInstance:
       propertyPath: dialogues.Array.data[0].onDialogueAssigned.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1972592142}
-    - target: {fileID: 2038001439827558481, guid: ba6f6668b6fc870438d670062b374de1,
-        type: 3}
-      propertyPath: MaxDistance
-      value: 10
-      objectReference: {fileID: 0}
     - target: {fileID: 2038001439827558494, guid: ba6f6668b6fc870438d670062b374de1,
         type: 3}
       propertyPath: audioSourceOBJ
       value: 
       objectReference: {fileID: 1280247127}
-    - target: {fileID: 2038001440868637158, guid: ba6f6668b6fc870438d670062b374de1,
-        type: 3}
-      propertyPath: MaxDistance
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 3812875239196285591, guid: ba6f6668b6fc870438d670062b374de1,
-        type: 3}
-      propertyPath: m_BaseOffset
-      value: 0.945
-      objectReference: {fileID: 0}
     - target: {fileID: 3812875239196285598, guid: ba6f6668b6fc870438d670062b374de1,
         type: 3}
       propertyPath: m_RootOrder
@@ -86184,26 +86154,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mage
       objectReference: {fileID: 0}
-    - target: {fileID: 4459333977865257567, guid: d9ac546c27f190a4397ad3ca47c4dede,
-        type: 3}
-      propertyPath: m_BaseOffset
-      value: 0.945
-      objectReference: {fileID: 0}
     - target: {fileID: 7107781218897016778, guid: d9ac546c27f190a4397ad3ca47c4dede,
         type: 3}
       propertyPath: audioSourceOBJ
       value: 
       objectReference: {fileID: 1280247127}
-    - target: {fileID: 7107781218897016781, guid: d9ac546c27f190a4397ad3ca47c4dede,
-        type: 3}
-      propertyPath: MaxDistance
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 7107781220281388421, guid: d9ac546c27f190a4397ad3ca47c4dede,
-        type: 3}
-      propertyPath: MaxDistance
-      value: 10
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d9ac546c27f190a4397ad3ca47c4dede, type: 3}
 --- !u!4 &4576763181580475743
@@ -87222,26 +87177,11 @@ PrefabInstance:
       propertyPath: dialogues.Array.data[1].onDialogueAssigned.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1972592142}
-    - target: {fileID: 2828708536311610561, guid: 839e99d8ac1a4044e93257dc283bd3cf,
-        type: 3}
-      propertyPath: MaxDistance
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 2828708536473631906, guid: 839e99d8ac1a4044e93257dc283bd3cf,
-        type: 3}
-      propertyPath: MaxDistance
-      value: 10
-      objectReference: {fileID: 0}
     - target: {fileID: 2828708536473631907, guid: 839e99d8ac1a4044e93257dc283bd3cf,
         type: 3}
       propertyPath: audioSourceOBJ
       value: 
       objectReference: {fileID: 1280247127}
-    - target: {fileID: 7462664476185379505, guid: 839e99d8ac1a4044e93257dc283bd3cf,
-        type: 3}
-      propertyPath: m_BaseOffset
-      value: 0.945
-      objectReference: {fileID: 0}
     - target: {fileID: 7462664476185379529, guid: 839e99d8ac1a4044e93257dc283bd3cf,
         type: 3}
       propertyPath: m_Name
@@ -87381,21 +87321,11 @@ PrefabInstance:
       propertyPath: dialogues.Array.data[1].onDialogueAssigned.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1972592142}
-    - target: {fileID: 5780603287011298493, guid: 729bfed8617d41f41b05b50875f5d630,
-        type: 3}
-      propertyPath: MaxDistance
-      value: 10
-      objectReference: {fileID: 0}
     - target: {fileID: 5780603287395791808, guid: 729bfed8617d41f41b05b50875f5d630,
         type: 3}
       propertyPath: audioSourceOBJ
       value: 
       objectReference: {fileID: 1280247127}
-    - target: {fileID: 5780603287395791811, guid: 729bfed8617d41f41b05b50875f5d630,
-        type: 3}
-      propertyPath: MaxDistance
-      value: 10
-      objectReference: {fileID: 0}
     - target: {fileID: 7774373394733754980, guid: 729bfed8617d41f41b05b50875f5d630,
         type: 3}
       propertyPath: m_RootOrder
@@ -87455,11 +87385,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Druid
-      objectReference: {fileID: 0}
-    - target: {fileID: 7774373394733754989, guid: 729bfed8617d41f41b05b50875f5d630,
-        type: 3}
-      propertyPath: m_BaseOffset
-      value: 0.945
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 729bfed8617d41f41b05b50875f5d630, type: 3}
@@ -87595,11 +87520,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Engineer
       objectReference: {fileID: 0}
-    - target: {fileID: 8154038049782548155, guid: 51fc3a1c1e5b0f045b8abfaa0f04587b,
-        type: 3}
-      propertyPath: m_BaseOffset
-      value: 0.945
-      objectReference: {fileID: 0}
     - target: {fileID: 8154038049782548156, guid: 51fc3a1c1e5b0f045b8abfaa0f04587b,
         type: 3}
       propertyPath: m_RootOrder
@@ -87654,16 +87574,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9172569591119902896, guid: 51fc3a1c1e5b0f045b8abfaa0f04587b,
-        type: 3}
-      propertyPath: MaxDistance
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 9172569591601963280, guid: 51fc3a1c1e5b0f045b8abfaa0f04587b,
-        type: 3}
-      propertyPath: MaxDistance
-      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 9172569591601963281, guid: 51fc3a1c1e5b0f045b8abfaa0f04587b,
         type: 3}

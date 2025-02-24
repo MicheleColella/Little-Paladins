@@ -14898,7 +14898,7 @@ NavMeshAgent:
   m_AutoBraking: 1
   m_AutoRepath: 1
   m_Height: 2
-  m_BaseOffset: 0.93
+  m_BaseOffset: 0.945
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
 --- !u!54 &8154038049782548154
@@ -15425,7 +15425,7 @@ AudioSource:
   Priority: 128
   DopplerLevel: 1
   MinDistance: 0
-  MaxDistance: 6
+  MaxDistance: 10
   Pan2D: 0
   rolloffMode: 1
   BypassEffects: 0
@@ -15810,7 +15810,7 @@ AudioSource:
   Priority: 128
   DopplerLevel: 1
   MinDistance: 0
-  MaxDistance: 6
+  MaxDistance: 10
   Pan2D: 0
   rolloffMode: 1
   BypassEffects: 0
@@ -16385,6 +16385,43 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 8154038050385737845}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1555913609
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8011439893078662570}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fff0960ef4ea6e04eac66b4a7fd2189d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_RigLayers:
+  - m_Rig: {fileID: 1648116061}
+    m_Active: 1
+  m_Effectors: []
+--- !u!114 &1555913610
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8011439893078662570}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a33cce7b2ee9564b9195b5ddfb81f57, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  headIKTarget: {fileID: 1057668054}
+  targetLayer:
+    serializedVersion: 2
+    m_Bits: 2048
+  searchRadius: 4
+  minSearchRadius: 1.8
+  fieldOfView: 116
+  targetSmoothSpeed: 5
+  defaultSmoothSpeed: 20
 --- !u!114 &9172569590268261060
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16452,44 +16489,6 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
   avatarController: {fileID: 8154038049782548152}
---- !u!114 &1555913609
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8011439893078662570}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fff0960ef4ea6e04eac66b4a7fd2189d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_RigLayers:
-  - m_Rig: {fileID: 1648116061}
-    m_Active: 1
-  m_Effectors: []
---- !u!114 &1555913610
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8011439893078662570}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a33cce7b2ee9564b9195b5ddfb81f57, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  animator: {fileID: 3439249397558761368}
-  headIKTarget: {fileID: 1057668054}
-  targetLayer:
-    serializedVersion: 2
-    m_Bits: 2048
-  searchRadius: 4
-  minSearchRadius: 1.8
-  fieldOfView: 116
-  targetSmoothSpeed: 5
-  defaultSmoothSpeed: 20
 --- !u!4 &9097757082506959730 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1110506447530992391, guid: bba52cb8327573a4299109283d05b63e,
